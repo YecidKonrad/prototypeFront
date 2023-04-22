@@ -119,6 +119,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "supportportalapp"
+    }
+  },
+  "defaultProject": "supportportalapp",
+  "cli": {
+    "analytics": "19451158-4938-459d-9f57-a149fbe21c4a"
+  }
 }
