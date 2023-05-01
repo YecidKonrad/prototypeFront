@@ -48,7 +48,8 @@
                             <span class="input-group-text"><i class="fas fa-columns"></i></span>
                         </div>
                         <select class="form-control" name="idIdentificationType" placeholder="Identificationtype" required ngModel #idIdentificationTypeInput="ngModel">
-                            <option [value]="item" *ngFor="let item of lista">{{item}}</option>
+                          <option>Choose your identification type</option>
+                          <option [value]="item" *ngFor="let item of lista">{{item}}</option>
                             </select>
                     </div>
                     <span class="help-block" *ngIf="idIdentificationTypeInput.invalid && idIdentificationTypeInput.touched" style="color:red;">Please choose an identitificationType.</span>

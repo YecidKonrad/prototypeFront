@@ -30,6 +30,7 @@ export class UserComponent implements OnInit, OnDestroy {
   public editUser = new User();
   private currentUsername: string;
   public fileStatus = new FileUploadStatus();
+  lista:any[]=[1,2];
 
   constructor(private router: Router, private authenticationService: AuthenticationService,
               private userService: UserService, private notificationService: NotificationService) {}
@@ -101,6 +102,7 @@ export class UserComponent implements OnInit, OnDestroy {
 
   public onUpdateUser(): void {
     const formData = this.userService.createUserFormDate(this.currentUsername, this.editUser, this.profileImage);
+    console.log(JSON.stringify(formData.get))
     this.subscriptions.push(
       this.userService.updateUser(formData).subscribe(
         (response: User) => {

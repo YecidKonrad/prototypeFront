@@ -13,7 +13,7 @@ export class User {
   public notLocked: boolean;
   public role: string;
   public authorities: [];
-  public idIdentificationType:any;
+  public idIdentificationType: number;
 
   constructor() {
     this.userId = '';
