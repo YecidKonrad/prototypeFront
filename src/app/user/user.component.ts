@@ -30,10 +30,10 @@ export class UserComponent implements OnInit, OnDestroy {
   public editUser = new User();
   private currentUsername: string;
   public fileStatus = new FileUploadStatus();
-  lista:any[]=[1,2];
+  lista: any[] = [1, 2];
 
   constructor(private router: Router, private authenticationService: AuthenticationService,
-              private userService: UserService, private notificationService: NotificationService) {}
+    private userService: UserService, private notificationService: NotificationService) { }
 
   ngOnInit(): void {
     this.user = this.authenticationService.getUserFromLocalCache();
@@ -71,7 +71,7 @@ export class UserComponent implements OnInit, OnDestroy {
   }
 
   public onProfileImageChange(fileName: string, profileImage: File): void {
-    this.fileName =  fileName;
+    this.fileName = fileName;
     this.profileImage = profileImage;
   }
 
@@ -80,7 +80,7 @@ export class UserComponent implements OnInit, OnDestroy {
   }
 
   public onAddNewUser(userForm: NgForm): void {
-    console.log(JSON.stringify(userForm.value));
+    // console.log(JSON.stringify(userForm.value));
     const formData = this.userService.createUserFormDate(null, userForm.value, this.profileImage);
     this.subscriptions.push(
       this.userService.addUser(formData).subscribe(
@@ -97,12 +97,12 @@ export class UserComponent implements OnInit, OnDestroy {
           this.profileImage = null;
         }
       )
-      );
+    );
   }
 
   public onUpdateUser(): void {
     const formData = this.userService.createUserFormDate(this.currentUsername, this.editUser, this.profileImage);
-    console.log(JSON.stringify(formData.get))
+    // console.log(JSON.stringify(formData.get))
     this.subscriptions.push(
       this.userService.updateUser(formData).subscribe(
         (response: User) => {
@@ -117,7 +117,7 @@ export class UserComponent implements OnInit, OnDestroy {
           this.profileImage = null;
         }
       )
-      );
+    );
   }
 
   public onUpdateCurrentUser(user: User): void {
@@ -139,14 +139,14 @@ export class UserComponent implements OnInit, OnDestroy {
           this.profileImage = null;
         }
       )
-      );
+    );
   }
 
   public onUpdateProfileImage(): void {
     const formData = new FormData();
     formData.append('username', this.user.username);
     formData.append('profileImage', this.profileImage);
-    console.log(JSON.stringify(formData));
+    // console.log(JSON.stringify(formData));
     this.subscriptions.push(
       this.userService.updateProfileImage(formData).subscribe(
         (event: HttpEvent<any>) => {
@@ -233,10 +233,10 @@ export class UserComponent implements OnInit, OnDestroy {
     const results: User[] = [];
     for (const user of this.userService.getUsersFromLocalCache()) {
       if (user.firstName.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
-          user.lastName.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
-          user.username.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
-          user.userId.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1) {
-          results.push(user);
+        user.lastName.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
+        user.username.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
+        user.userId.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1) {
+        results.push(user);
       }
     }
     this.users = results;
