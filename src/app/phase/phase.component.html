@@ -170,7 +170,7 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title text-center">New Phase</h5>
+            <h5 class="modal-title text-center">Create Phase</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -184,31 +184,49 @@
                 </div>
                 <div class="form-group">
                   <label for="description">Description</label>
-                  <textarea class="form-control" name="description" id="description" rows="3" required
+                  <textarea class="form-control" name="description" id="description" rows="2" required
                     ngModel></textarea>
                 </div>
-                <div class="form-group">
-                  <label for="startDuration">startDuration</label>
-                  <input size="16" class="form-control" name="startDuration" id="startDuration" type="datetime-local"
-                    required ngModel>
+                <div class="row">
+                  <div class="col-6">
+                    <div class="mb-3">
+                      <label class="form-label">Start Duration</label>
+                      <input size="16" class="form-control" name="startDuration" id="startDuration"
+                        type="datetime-local" required ngModel>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="mb-3">
+                      <label class="form-label">End Duration</label>
+                      <input size="16" class="form-control" name="endDuration" id="endDuration" type="datetime-local"
+                        required ngModel>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-6">
+                    <div class="mb-3">
+                      <label for="ordering">Ordering</label>
+                      <input type="number" name="ordering" required class="form-control" required ngModel>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="mb-3">
+                      <label for="statePhase">state Phase</label>
+                      <select name="statePhase" id="statePhase" required class="form-control" required
+                        [(ngModel)]="phaseStateSelected">
+                        <option [ngValue]="phaseState" *ngFor="let phaseState of phaseStates">
+                          {{phaseState.state}}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
                 <div class="form-group">
-                  <label for="endDuration">endDuration</label>
-                  <input size="16" class="form-control" name="endDuration" id="endDuration" type="datetime-local"
-                    required ngModel>
-                </div>
-                <div class="form-group">
-                  <label for="ordering">Ordering</label>
-                  <input type="number" name="ordering" required class="form-control" required ngModel>
-                </div>
-                <div class="form-group">
-                  <label for="statePhase">state Phase</label>
-                  <select name="statePhase" id="statePhase" required class="form-control" required
-                    [(ngModel)]="phaseStateSelected">
-                    <option [ngValue]="phaseState" *ngFor="let phaseState of phaseStates">
-                      {{phaseState.state}}
-                    </option>
-                  </select>
+                  <label for="usersAsign">Asign users</label>
+                  <ngx-bootstrap-multiselect [options]="myOptions" [texts]="myTexts" [settings]="mySettings"
+                    [(ngModel)]="optionsModel" (ngModelChange)="onChange()" class="form-control"
+                    [ngModelOptions]="{standalone: true}" required></ngx-bootstrap-multiselect>
                 </div>
                 <button type="submit" style="display: none;" id="new-phase-save"></button>
               </form>

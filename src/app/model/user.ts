@@ -1,4 +1,7 @@
+import { IMultiSelectOption } from "ngx-bootstrap-multiselect";
+
 export class User {
+  public idUser: number;
   public userId: string;
   public firstName: string;
   public lastName: string;
@@ -16,6 +19,7 @@ export class User {
   public idIdentificationType: number;
 
   constructor() {
+    this.idUser = 0;
     this.userId = '';
     this.firstName = '';
     this.lastName = '';
@@ -32,5 +36,4 @@ export class User {
     this.authorities = [];
     this.idIdentificationType = 0;
   }
-
 }

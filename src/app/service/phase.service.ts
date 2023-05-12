@@ -5,6 +5,7 @@ import { Phase } from '../model/phase';
 import { Observable } from 'rxjs';
 import { StatePhase } from '../model/state-phase';
 import { HeaderType } from '../enum/header-type.enum';
+import { PhaseRequest } from '../model/phase-request';
 
 @Injectable({
   providedIn: 'root'
@@ -23,20 +24,10 @@ export class PhaseService {
     return this.http.get<StatePhase[]>(`${this.host}/phase/states`);
   }
 
-  public createPhases(phase: Phase, token: string): Observable<Phase> {
+  public createPhases(phase: PhaseRequest, token: string): Observable<Phase> {
+    console.log('En el service ' + JSON.stringify(phase));
     let headers = new HttpHeaders().set('Content-Type', 'application/json').set(HeaderType.JWT_TOKEN, token);
     return this.http.post<Phase>(`${this.host}/phase/create`, JSON.stringify(phase), { headers: headers });
   }
 
-  public createPhaseFormData(loggedInUsername: string, _phase: Phase): FormData {
-    const formDataPhase = new FormData();
-    formDataPhase.append('phase', _phase.phase);
-    formDataPhase.append('startDuration', _phase.startDuration.toString());
-    formDataPhase.append('endDuration', _phase.endDuration.toString());
-    formDataPhase.append('description', _phase.description.toString());
-    formDataPhase.append('ordering', _phase.ordering.toString());
-    formDataPhase.append('idStatePhase', _phase.statePhase.idStatePhase.toString());
-    return formDataPhase;
-  }
-  //{ query_string: searchTerm }
 }
