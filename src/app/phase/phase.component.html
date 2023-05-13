@@ -92,7 +92,7 @@
     </div>
     <button [hidden]="true" type="button" id="openPhaseInfo" data-toggle="modal" data-target="#viewPhaseModal">
     </button>
-    <button [hidden]="true" type="button" id="openUserEdit" data-toggle="modal" data-target="#editUserModal">
+    <button [hidden]="true" type="button" id="openUserEdit" data-toggle="modal" data-target="#editPhaseModal">
     </button>
     <!-- user profile -->
 
@@ -102,9 +102,7 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title text-center" id="exampleModalLongTitle"> {{selectedPhase?.idPhase}}
-              {{selectedPhase?.phase}}
-            </h5>
+            <h5><span class="badge badge-primary"># {{selectedPhase?.idPhase}} </span> {{selectedPhase?.phase}}</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -112,26 +110,23 @@
           <div class="modal-body">
             <div>
               <div class="card">
-                <div class="card text-center">
-                  <div class="card-header" *ngIf="selectedPhase?.endDuration"><small>End Duration:
-                      {{selectedPhase?.endDuration | date: 'medium'}}</small>
+                <div class="">
+                  <div class="card-header text-center" *ngIf="selectedPhase?.endDuration"><small> End Duration :
+                    </small>
+                    <span class="badge badge-danger">{{selectedPhase?.endDuration | date: 'medium'}}</span>
                   </div>
                   <div class="card-body">
                     <div class="form-group">
-                      <label for="phaseTextareaDescription">Description</label>
+                      <label for="phaseTextareaDescription">Description: </label>
                       <textarea class="form-control" id="phaseTextareaDescription"
-                        value="{{selectedPhase?.description}}" rows="3"></textarea>
+                        value="{{selectedPhase?.description}}" rows="2" readonly></textarea>
                     </div>
-                    <ul class="list-group list-group-flush">
-                      <li class="list-group-item"></li>
-                      <li class="list-group-item"><i
-                          class="fa fa-calendar float-right"></i>{{selectedPhase?.createdDate}}
-                      </li>
-                      <li class="list-group-item"><i
-                          class="fa fa-sort-numeric-asc float-right"></i>{{selectedPhase?.ordering}}
-                      </li>
-                    </ul>
-                    <h6 class="modal-title text-center"> Users Asingned to Phases: </h6>
+                    <div class="form-group">
+                      <label for="phaseTextareaDescription">Created By: </label>
+                      <input type="text" class="form-control" readonly
+                        value="{{selectedPhase?.createdBy.firstName}} {{selectedPhase?.createdBy.lastName}} - ({{selectedPhase?.createdBy.username}})">
+                    </div>
+                    <h6 class="modal-title"> Users Asingned to Phases: </h6>
                     <table class="table table-hover">
                       <thead class="table-borderless">
                         <tr class="text-center">
@@ -149,8 +144,10 @@
                       </tbody>
                     </table>
                   </div>
-                  <div class="card-footer text-muted">
-                    2 Days for Finishing.
+                  <div class="card-footer text-center">
+                    {{selectedPhase?.createdDate | date: 'medium'}} -
+                    <span class="badge badge-pill badge-danger">{{getDiffDays(selectedPhase?.startDuration,
+                      selectedPhase?.endDuration)}}</span> Days To Finish.
                   </div>
                 </div>
               </div>
@@ -187,6 +184,12 @@
                   <textarea class="form-control" name="description" id="description" rows="2" required
                     ngModel></textarea>
                 </div>
+                <div class="form-group">
+                  <label for="usersAsign">Asign users</label>
+                  <ngx-bootstrap-multiselect [options]="myOptions" [texts]="myTexts" [settings]="mySettings"
+                    [(ngModel)]="optionsModel" (ngModelChange)="onChange()" class="form-control"
+                    [ngModelOptions]="{standalone: true}" required></ngx-bootstrap-multiselect>
+                </div>
                 <div class="row">
                   <div class="col-6">
                     <div class="mb-3">
@@ -222,12 +225,6 @@
                     </div>
                   </div>
                 </div>
-                <div class="form-group">
-                  <label for="usersAsign">Asign users</label>
-                  <ngx-bootstrap-multiselect [options]="myOptions" [texts]="myTexts" [settings]="mySettings"
-                    [(ngModel)]="optionsModel" (ngModelChange)="onChange()" class="form-control"
-                    [ngModelOptions]="{standalone: true}" required></ngx-bootstrap-multiselect>
-                </div>
                 <button type="submit" style="display: none;" id="new-phase-save"></button>
               </form>
             </div>
@@ -242,15 +239,15 @@
       </div>
     </div>
 
-    <!-- modal edit user -->
-    <!--
-    <div class="modal draggable fade bd-example-modal-lg" id="editUserModal" tabindex="-1" role="dialog"
+    <!-- modal edit phase -->
+
+    <div class="modal draggable fade bd-example-modal-lg" id="editPhaseModal" tabindex="-1" role="dialog"
       aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title text-center">Edit {{editUser?.firstName}} {{editUser?.lastName}} <small
-                [hidden]="isAdminOrManager">
+            <h5 class="modal-title text-center">Edit <span class="badge badge-primary"># {{editPhase?.idPhase}}
+              </span> {{editPhase?.phase}} <small [hidden]="isAdminOrManager">
                 (read only)
               </small></h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -259,78 +256,75 @@
           </div>
           <div class="modal-body">
             <div class="">
-              <form #editUserForm="ngForm">
+              <form #editPhaseForm="ngForm">
                 <div class="form-group">
-                  <label for="firstName">First Name</label>
-                  <input type="text" name="firstName" [disabled]="!isAdminOrManager" required
-                    [(ngModel)]="editUser.firstName" class="form-control">
+                  <label for="phaseEdit">Phase</label>
+                  <input type="text" name="phaseEdit" [disabled]="!isAdminOrManager" required
+                    [(ngModel)]="editPhase.phase" class="form-control">
                 </div>
                 <div class="form-group">
-                  <label for="lastName">Last Name</label>
-                  <input type="text" name="lastName" [disabled]="!isAdminOrManager" required
-                    [(ngModel)]="editUser.lastName" class="form-control">
+                  <label for="descriptionEdit">Description</label>
+                  <textarea class="form-control" name="descriptionEdit" [disabled]="!isAdminOrManager" id="description"
+                    rows="2" required [(ngModel)]="editPhase.description">{{editPhase.description}}</textarea>
                 </div>
                 <div class="form-group">
-                  <label for="username">Username</label>
-                  <input type="text" name="username" [disabled]="!isAdminOrManager" required
-                    [(ngModel)]="editUser.username" class="form-control">
+                  <label for="usersAsignEdit">Asign users</label>
+                  <ngx-bootstrap-multiselect [options]="myOptions" [texts]="myTexts" [settings]="mySettings"
+                    [(ngModel)]="optionsModel" (ngModelChange)="onChange()" class="form-control"
+                    [disabled]="!isAdminOrManager" [ngModelOptions]="{standalone: true}"
+                    required></ngx-bootstrap-multiselect>
                 </div>
-                <div class="form-group">
-                  <label for="email">Email</label>
-                  <input type="email" name="email" [disabled]="!isAdminOrManager" required [(ngModel)]="editUser.email"
-                    class="form-control">
-                </div>
-                <div class="form-group">
-                  <label for="authority">Role <small [hidden]="isAdmin">(read only)</small></label>
-                  <select name="role" [disabled]="!isAdmin" required [(ngModel)]="editUser.role" class="form-control">
-                    <option value="ROLE_USER">USER</option>
-                    <option value="ROLE_HR">HR</option>
-                    <option value="ROLE_MANAGER">MANAGER</option>
-                    <option value="ROLE_ADMIN">ADMIN</option>
-                    <option value="ROLE_SUPER_ADMIN">SUPER ADMIN</option>
-                  </select>
-                </div>
-                <div class="input-group mb-2">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text">Profile Picture </span>
+                <div class="row">
+                  <div class="col-6">
+                    <div class="mb-3">
+                      <label for="startDurationEdit" class="form-label">Start Duration</label>
+                      <input size="16" class="form-control" name="startDurationEdit" id="startDurationEdit"
+                        value="{{editPhase.startDuration}}" type="datetime-local" required
+                        [(ngModel)]="editPhase.startDuration">
+                    </div>
                   </div>
-                  <div class="custom-file">
-                    <input type="file" accept="image/*" [disabled]="!isAdminOrManager" name="profileImage"
-                      (change)="onProfileImageChange($event.target.files[0].name, $event.target.files[0])"
-                      class="custom-file-input">
-                    <label class="custom-file-label"><span [hidden]="!fileName">{{fileName}}</span>
-                      <span [hidden]="fileName">Choose File</span>
-                    </label>
+                  <div class="col-6">
+                    <div class="mb-3">
+                      <label for="endDurationEdit" class="form-label">End Duration</label>
+                      <input size="16" class="form-control" name="endDurationEdit" id="endDurationEdit"
+                        value="{{editPhase.endDuration}}" type="datetime-local" [(ngModel)]="editPhase.endDuration"
+                        required>
+                    </div>
                   </div>
                 </div>
-                <fieldset class="form-group">
-                  <div class="form-check">
-                    <label class="form-check-label">
-                      <input name="active" type="checkbox" [disabled]="!isManager" [(ngModel)]="editUser.active"
-                        class="form-check-input">
-                      Acitve <small [hidden]="isManager">(read only)</small>
-                    </label>
+                <div class="row">
+                  <div class="col-6">
+                    <div class="mb-3">
+                      <label for="orderingEdit">Ordering</label>
+                      <input type="number" name="orderingEdit" value="{{editPhase.ordering}}"
+                        [(ngModel)]="editPhase.ordering" required class="form-control" required ngModel>
+                    </div>
                   </div>
-                  <div class="form-check disabled">
-                    <label class="form-check-label">
-                      <input name="locked" type="checkbox" [disabled]="!isManager" [(ngModel)]="editUser.notLocked"
-                        class="form-check-input">
-                      Unlocked <small [hidden]="isManager">(read only)</small>
-                    </label>
+                  <div class="col-6">
+                    <div class="mb-3">
+                      <label for="statePhaseEdit">state Phase</label>
+                      <select name="statePhaseEdit" id="statePhaseEdit" required class="form-control" required
+                        [(ngModel)]="phaseStateSelected">
+                        <option [ngValue]="phaseState" *ngFor="let phaseState of phaseStates">
+                          {{phaseState.state}}
+                        </option>
+                      </select>
+                    </div>
                   </div>
-                </fieldset>
+                </div>
+
               </form>
             </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal"
               id="closeEditUserModalButton">Close</button>
-            <button type="button" (click)="onUpdateUser()" [disabled]="editUserForm.invalid || !isAdminOrManager"
-              class="btn btn-primary">Save changes</button>
+            <button type="button" [disabled]="editPhaseForm.invalid || !isAdminOrManager" class="btn btn-primary">Save
+              changes</button>
           </div>
         </div>
       </div>
-    </div> -->
+    </div>
 
   </div>
 </div>

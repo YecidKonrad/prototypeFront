@@ -22,7 +22,7 @@ import { PhaseRequest } from '../model/phase-request';
   styleUrls: ['./phase.component.css']
 })
 export class PhaseComponent implements OnInit {
-  private titleSubject = new BehaviorSubject<string>('Users');
+  private titleSubject = new BehaviorSubject<string>('Phases');
   public titleAction$ = this.titleSubject.asObservable();
   public phases: Phase[];
   public phaseStates: StatePhase[];
@@ -111,6 +111,22 @@ export class PhaseComponent implements OnInit {
   }
 
   public searchPhases(searchTerm: string): void {
+    const results: Phase[] = [];
+    for (const phase of this.phases) {
+      if (phase.idPhase.toString().toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
+        phase.phase.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
+        phase.createdDate.toString().toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
+        phase.createdBy.username.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
+        phase.createdBy.email.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
+        phase.endDuration.toString().indexOf(searchTerm.toLowerCase()) !== -1 ||
+        phase.statePhase.state.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1) {
+        results.push(phase);
+      }
+    }
+    this.phases = results;
+    if (results.length === 0 || !searchTerm) {
+      this.getPhases(false);
+    }
 
   }
   public onSelectPhase(selectedPhase: Phase): void {
@@ -223,6 +239,22 @@ export class PhaseComponent implements OnInit {
     });
     return userReturn;
   }
+
+  getDiffDays(sDate, eDate) {
+    var startDate = new Date(sDate);
+    var endDate = new Date(eDate);
+
+    var Time = endDate.getTime() - startDate.getTime();
+    return Math.ceil(Math.abs(Time) / (1000 * 60 * 60 * 24));
+  }
+  public get isManager(): boolean {
+    return this.isAdmin || this.getUserRole() === Role.MANAGER;
+  }
+
+  public get isAdminOrManager(): boolean {
+    return this.isAdmin || this.isManager;
+  }
+
 
 }
 
