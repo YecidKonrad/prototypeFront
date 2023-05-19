@@ -11,6 +11,7 @@ import { AuthenticationService } from '../service/authentication.service';
 import { Router } from '@angular/router';
 import { FileUploadStatus } from '../model/file-upload.status';
 import { Role } from '../enum/role.enum';
+import { IdentificationType } from '../model/identification-types';
 
 @Component({
   selector: 'app-user',
@@ -31,6 +32,7 @@ export class UserComponent implements OnInit, OnDestroy {
   private currentUsername: string;
   public fileStatus = new FileUploadStatus();
   lista: any[] = [1, 2];
+  public identificationTypes: IdentificationType[];
 
   constructor(private router: Router, private authenticationService: AuthenticationService,
     private userService: UserService, private notificationService: NotificationService) { }
@@ -38,6 +40,7 @@ export class UserComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.user = this.authenticationService.getUserFromLocalCache();
     this.getUsers(true);
+    this.getIdentificationTypes();
   }
 
   public changeTitle(title: string): void {
@@ -101,7 +104,7 @@ export class UserComponent implements OnInit, OnDestroy {
   }
 
   public onUpdateUser(): void {
-    const formData = this.userService.createUserFormDate(this.currentUsername, this.editUser, this.profileImage);
+    const formData = this.userService.UpdateUserFormDate(this.currentUsername, this.editUser);
     // console.log(JSON.stringify(formData.get))
     this.subscriptions.push(
       this.userService.updateUser(formData).subscribe(
@@ -275,6 +278,18 @@ export class UserComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  public getIdentificationTypes(): void {
+    this.userService.getIdentificationTypes().subscribe(
+      (response: IdentificationType[]) => {
+        this.identificationTypes = response;
+      },
+      (errorResponse: HttpErrorResponse) => {
+        this.sendNotification(NotificationType.ERROR, errorResponse.error.message);
+        this.refreshing = false;
+      }
+    );
   }
 
 }

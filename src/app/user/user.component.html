@@ -394,6 +394,16 @@
                   <input type="text" name="username" required ngModel class="form-control">
                 </div>
                 <div class="form-group">
+                  <label for="identificationType">Identification Type <small [hidden]="isAdmin">(read
+                      only)</small></label>
+                  <select class="form-control" name="identificationType" [disabled]="!isAdmin"
+                    placeholder="Identification type" required ngModel>
+                    <option [value]="identificationType.idIdentificationType"
+                      *ngFor="let identificationType of identificationTypes">
+                      {{identificationType.identification}}</option>
+                  </select>
+                </div>
+                <div class="form-group">
                   <label for="email">Email</label>
                   <input type="email" name="email" required ngModel class="form-control">
                 </div>
@@ -414,15 +424,6 @@
                 <div class="input-group mb-2">
                   <div class="input-group-prepend">
                     <span class="input-group-text">Profile Picture </span>
-                  </div>
-                  <div class="custom-file">
-                    <input type="file" accept="image/*" name="profileImage"
-                      (change)="onProfileImageChange($event.target.files[0].name, $event.target.files[0])"
-                      class="custom-file-input">
-                    <label class="custom-file-label"><span [hidden]="!fileName">{{ fileName
-                        }}</span>
-                      <span [hidden]="fileName">Choose File</span>
-                    </label>
                   </div>
                 </div>
                 <fieldset class="form-group">
@@ -482,7 +483,7 @@
                 <div class="form-group">
                   <label for="username">Username</label>
                   <input type="text" name="username" [disabled]="!isAdminOrManager" required
-                    [(ngModel)]="editUser.username" class="form-control">
+                    [(ngModel)]="editUser.username" class="form-control" readonly>
                 </div>
                 <div class="form-group">
                   <label for="email">Email</label>
@@ -503,23 +504,13 @@
                   <label for="idIdentificationType">Identification Type <small [hidden]="isAdmin">(read
                       only)</small></label>
                   <select class="form-control" name="idIdentificationType" [disabled]="!isAdmin"
-                    placeholder="Identification type" required [(ngModel)]="editUser.idIdentificationType">
-                    <option [value]="item" *ngFor="let item of lista">{{item}}</option>
+                    placeholder="Identification type" required [(ngModel)]="editUser.identificationType">
+                    <option [value]="identificationType.idIdentificationType"
+                      *ngFor="let identificationType of identificationTypes">
+                      {{identificationType.identification}}</option>
                   </select>
                 </div>
-                <div class="input-group mb-2">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text">Profile Picture </span>
-                  </div>
-                  <div class="custom-file">
-                    <input type="file" accept="image/*" [disabled]="!isAdminOrManager" name="profileImage"
-                      (change)="onProfileImageChange($event.target.files[0].name, $event.target.files[0])"
-                      class="custom-file-input">
-                    <label class="custom-file-label"><span [hidden]="!fileName">{{fileName}}</span>
-                      <span [hidden]="fileName">Choose File</span>
-                    </label>
-                  </div>
-                </div>
+
                 <fieldset class="form-group">
                   <div class="form-check">
                     <label class="form-check-label">

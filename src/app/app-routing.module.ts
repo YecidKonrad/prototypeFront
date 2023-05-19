@@ -5,6 +5,7 @@ import { RegisterComponent } from './register/register.component';
 import { UserComponent } from './user/user.component';
 import { AuthenticationGuard } from './guard/authentication.guard';
 import { PhaseComponent } from './phase/phase.component';
+import { ActivityComponent } from './activity/activity.component';
 
 
 const routes: Routes = [
@@ -12,6 +13,7 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'user/management', component: UserComponent, canActivate: [AuthenticationGuard] },
   { path: 'phase/management', component: PhaseComponent, canActivate: [AuthenticationGuard] },
+  { path: 'activity/management', component: ActivityComponent, canActivate: [AuthenticationGuard] },
   { path: '', redirectTo: '/login', pathMatch: 'full' }
 ];
 
@@ -19,4 +21,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

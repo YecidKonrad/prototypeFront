@@ -4,12 +4,13 @@ import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 import { User } from '../model/user';
 import { CustomHttpRespone } from '../model/custom-http-response';
+import { IdentificationType } from '../model/identification-types';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class UserService {
   private host = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   public getUsers(): Observable<User[]> {
     return this.http.get<User[]>(`${this.host}/user/users`);
@@ -29,9 +30,10 @@ export class UserService {
 
   public updateProfileImage(formData: FormData): Observable<HttpEvent<User>> {
     return this.http.post<User>(`${this.host}/user/updateProfileImage`, formData,
-    {reportProgress: true,
-      observe: 'events'
-    });
+      {
+        reportProgress: true,
+        observe: 'events'
+      });
   }
 
   public deleteUser(username: string): Observable<CustomHttpRespone> {
@@ -44,7 +46,7 @@ export class UserService {
 
   public getUsersFromLocalCache(): User[] {
     if (localStorage.getItem('users')) {
-        return JSON.parse(localStorage.getItem('users'));
+      return JSON.parse(localStorage.getItem('users'));
     }
     return null;
   }
@@ -55,12 +57,31 @@ export class UserService {
     formData.append('firstName', user.firstName);
     formData.append('lastName', user.lastName);
     formData.append('username', user.username);
+    formData.append('identificationType', user.identificationType.toString());
     formData.append('email', user.email);
     formData.append('role', user.role);
     formData.append('profileImage', profileImage);
     formData.append('isActive', JSON.stringify(user.active));
     formData.append('isNonLocked', JSON.stringify(user.notLocked));
     return formData;
+  }
+
+  public UpdateUserFormDate(loggedInUsername: string, user: User): FormData {
+    const formData = new FormData();
+    formData.append('currentUsername', loggedInUsername);
+    formData.append('firstName', user.firstName);
+    formData.append('lastName', user.lastName);
+    formData.append('username', user.username);
+    formData.append('email', user.email);
+    formData.append('role', user.role);
+    formData.append('isActive', JSON.stringify(user.active));
+    formData.append('isNonLocked', JSON.stringify(user.notLocked));
+    formData.append('identificationType', user.identificationType.toString());
+    return formData;
+  }
+
+  public getIdentificationTypes(): Observable<IdentificationType[]> {
+    return this.http.get<IdentificationType[]>(`${this.host}/identifications-types/types`);
   }
 
 }

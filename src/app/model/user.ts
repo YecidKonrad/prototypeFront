@@ -1,4 +1,4 @@
-import { IMultiSelectOption } from "ngx-bootstrap-multiselect";
+import { IdentificationType } from "./identification-types";
 
 export class User {
   public idUser: number;
@@ -16,7 +16,7 @@ export class User {
   public notLocked: boolean;
   public role: string;
   public authorities: [];
-  public idIdentificationType: number;
+  public identificationType: IdentificationType;
 
   constructor() {
     this.idUser = 0;
@@ -34,6 +34,6 @@ export class User {
     this.notLocked = false;
     this.role = '';
     this.authorities = [];
-    this.idIdentificationType = 0;
+    this.identificationType = null;
   }
 }

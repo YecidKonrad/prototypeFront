@@ -16,6 +16,7 @@ import { RegisterComponent } from './register/register.component';
 import { UserComponent } from './user/user.component';
 import { PhaseComponent } from './phase/phase.component';
 import { NgxBootstrapMultiselectModule } from 'ngx-bootstrap-multiselect';
+import { ActivityComponent } from './activity/activity.component';
 
 
 
@@ -25,7 +26,8 @@ import { NgxBootstrapMultiselectModule } from 'ngx-bootstrap-multiselect';
     LoginComponent,
     RegisterComponent,
     UserComponent,
-    PhaseComponent
+    PhaseComponent,
+    ActivityComponent
   ],
   imports: [
     BrowserModule,
