@@ -1,5 +1,6 @@
 import { StatePhase } from "./state-phase";
 import { User } from "./user";
+import { Activity } from './activity';
 
 export class Phase {
   public idPhase: number;
@@ -12,5 +13,6 @@ export class Phase {
   public statePhase: StatePhase;
   public createdBy: User;
   public usersAsignedToPhase: User[];
+  public activitiesAsingPhase: Activity[];
 
 }

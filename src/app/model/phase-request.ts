@@ -1,3 +1,4 @@
+import { Activity } from "./activity";
 import { StatePhase } from "./state-phase";
 import { User } from "./user";
 
@@ -12,4 +13,5 @@ export class PhaseRequest {
   public statePhase: StatePhase;
   public createdBy: User;
   public usersAsignedToPhase: User[];
+  public activitiesAsingPhase: Activity[];
 }

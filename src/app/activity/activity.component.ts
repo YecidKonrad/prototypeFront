@@ -8,7 +8,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Phase } from '../model/phase';
 import { StatePhase } from '../model/state-phase';
 import { User } from '../model/user';
-import { IMultiSelectSettings, IMultiSelectTexts } from 'ngx-bootstrap-multiselect';
+import { IMultiSelectOption, IMultiSelectSettings, IMultiSelectTexts } from 'ngx-bootstrap-multiselect';
 import { PhaseRequest } from '../model/phase-request';
 import { Role } from '../enum/role.enum';
 import { AuthenticationService } from '../service/authentication.service';
@@ -35,7 +35,7 @@ export class ActivityComponent implements OnInit {
   public editActivity = new Activity();
   public activityStateSelected: StateActivity;
   public optionsModel: number[];
-  myOptions: any;
+  public myOptions;
   myTexts: IMultiSelectTexts;
   mySettings: IMultiSelectSettings;
   activityToCreate: Activity;
@@ -165,7 +165,12 @@ export class ActivityComponent implements OnInit {
 
   public onEditActivity(editActivity: Activity): void {
     this.editActivity = editActivity;
-    // this.currentUsername = editUser.username;
+    //FILTER THE USER ASIGNED PREVIUS
+    /* this.editActivity.usersAsignedToActivity.forEach(user => {
+       this.myOptions = this.users.filter(us => us.username == user.username);
+     });*/
+    // this.myOptions.forEach(function (e) { e.id = e.idUser, e.name = e.username });
+    // this.setPosibleStates(editActivity.stateActivity);
     this.clickButton('openActivityEdit');
   }
   getDiffDays(sDate, eDate) {
@@ -200,7 +205,7 @@ export class ActivityComponent implements OnInit {
     // Settings configuration
     this.mySettings = {
       enableSearch: true,
-      checkedStyle: 'fontawesome',
+      checkedStyle: 'checkboxes',
       buttonClasses: 'btn btn-default btn-block',
       //itemClasses: 'form-control',
       containerClasses: 'form-group',
@@ -221,5 +226,28 @@ export class ActivityComponent implements OnInit {
       allSelected: 'All selected',
     };
 
+  }
+
+  public setPosibleStates(stateActivity: StateActivity): void {
+    this.activityStates = this.activityStates.filter(ac => { ac.idStateActivity > stateActivity.idStateActivity });
+  }
+
+  public onUpdateActivity(): void {
+    // const formData = this.activityService.UpdateUserFormDate(this.editActivity);
+    // console.log(JSON.stringify(formData.get))
+    console.log(JSON.stringify(this.activityStateSelected))
+    this.editActivity.stateActivity = this.activityStateSelected;
+    this.subscriptions.push(
+      this.activityService.updateActivity(this.editActivity, this.authenticationService.getToken()).subscribe(
+        (response: Activity) => {
+          this.clickButton('closeEditActivityModalButton');
+          this.getActivities(false);
+          this.sendNotification(NotificationType.SUCCESS, `${response.idActivity} ${response.tittle} updated successfully`);
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendNotification(NotificationType.ERROR, errorResponse.error.message);
+        }
+      )
+    );
   }
 }

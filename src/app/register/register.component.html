@@ -10,7 +10,7 @@
         <form #registerForm="ngForm" (ngSubmit)="onRegister(registerForm.value)">
           <div class="input-group mb-3">
             <div class="input-group-append">
-              <span class="input-group-text"><i class="fas fa-user"></i></span>
+              <span class="input-group-text"><i class="fa fa-address-book"></i></span>
             </div>
             <input type="text" class="form-control" name="firstName" placeholder="First name" required ngModel
               #firstNameInput="ngModel">
@@ -28,7 +28,7 @@
             enter a last name</span>
           <div class="input-group mb-3">
             <div class="input-group-append">
-              <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+              <span class="input-group-text"><i class="fa fa-key"></i></span>
             </div>
             <input type="text" class="form-control" name="username" placeholder="Username" required ngModel
               #usernameInput="ngModel">
@@ -39,8 +39,8 @@
             <div class="input-group-append">
               <span class="input-group-text"><i class="fas fa-envelope"></i></span>
             </div>
-            <input type="text" class="form-control" name="email" placeholder="Email" required ngModel
-              #emailInput="ngModel">
+            <input type="email" class="form-control" name="email" placeholder="Email" required ngModel
+              #emailInput="ngModel" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}">
           </div>
           <span class="help-block" *ngIf="emailInput.invalid && emailInput.touched" style="color:red;">Please enter an
             email.</span>
@@ -55,7 +55,7 @@
             style="color:red;">Please enter an institution.</span>
           <div class="input-group mb-2">
             <div class="input-group-append">
-              <span class="input-group-text"><i class="fas fa-columns"></i></span>
+              <span class="input-group-text"><i class="fa fa-suitcase"></i></span>
             </div>
             <select class="form-control" name="identificationType" #idIdentificationTypeInput="ngModel"
               placeholder="Identification type" required ngModel>

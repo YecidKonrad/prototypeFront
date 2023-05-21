@@ -15,6 +15,8 @@ import { IMultiSelectOption, IMultiSelectSettings, IMultiSelectTexts } from 'ngx
 import { UserService } from '../service/user.service';
 import { newArray } from '@angular/compiler/src/util';
 import { PhaseRequest } from '../model/phase-request';
+import { ActivityService } from '../service/activity.service';
+import { Activity } from '../model/activity';
 
 @Component({
   selector: 'app-phase',
@@ -33,14 +35,21 @@ export class PhaseComponent implements OnInit {
   private subscriptions: Subscription[] = [];
   public editPhase = new Phase();
   public phaseStateSelected: StatePhase;
-  public optionsModel: number[];
-  myOptions;
+  public selectedUsersToPhase: number[];
+  public selectedActivitiesToPhase: number[];
+  usersAviables: any[];
+  activitiesAviables: any[];
   myTexts: IMultiSelectTexts;
   mySettings: IMultiSelectSettings;
   phaseToCreate: PhaseRequest;
+  public activities: Activity[];
+  myTexts1: IMultiSelectTexts;
+  mySettings1: IMultiSelectSettings;
 
   constructor(private router: Router, private authenticationService: AuthenticationService,
-    private phaseService: PhaseService, private userService: UserService, private notificationService: NotificationService) { }
+    private phaseService: PhaseService, private userService: UserService,
+    private notificationService: NotificationService,
+    private activityService: ActivityService) { }
 
   ngOnInit(): void {
     this.user = this.authenticationService.getUserFromLocalCache();
@@ -49,11 +58,17 @@ export class PhaseComponent implements OnInit {
     this.users = this.userService.getUsersFromLocalCache();
     console.log(JSON.stringify(this.users))
     this.loadConfigs();
-    this.myOptions = this.users;
-    this.myOptions.forEach(function (e) { e.id = e.idUser, e.name = e.username });
+    this.usersAviables = this.users;
+    this.usersAviables.forEach(function (e) { e.id = e.idUser, e.name = e.username });
+    this.getActivities(true);
+
+
   }
   onChange() {
-    console.log(this.optionsModel);
+    console.log(this.selectedUsersToPhase);
+  }
+  onChange1() {
+    console.log(this.selectedActivitiesToPhase);
   }
 
   public changeTitle(title: string): void {
@@ -72,6 +87,7 @@ export class PhaseComponent implements OnInit {
       this.phaseService.getPhases().subscribe(
         (response: Phase[]) => {
           this.phases = response;
+          console.log('phases full ' + JSON.stringify(this.phases));
           this.refreshing = false;
           if (showNotification) {
             this.sendNotification(NotificationType.SUCCESS, `${response.length} phase(s) loaded successfully.`);
@@ -83,7 +99,6 @@ export class PhaseComponent implements OnInit {
         }
       )
     );
-
   }
 
   public getPhaseStates(): void {
@@ -130,6 +145,7 @@ export class PhaseComponent implements OnInit {
 
   }
   public onSelectPhase(selectedPhase: Phase): void {
+    console.log('phase selected ' + JSON.stringify(selectedPhase));
     this.selectedPhase = selectedPhase;
     this.clickButton('openPhaseInfo');
   }
@@ -145,7 +161,7 @@ export class PhaseComponent implements OnInit {
 
   /*public onAddNewPhase(phaseForm: NgForm): void {
 
-    let usersAsingPhase = this.createUsersAsigRequest();
+    let usersAsingPhase = this.createUsersAsingRequest();
     let usersAsingPhaseMap = new Map<number, string>();
     // Iterar a través de las entradas del mapa y agregarlas al nuevo mapa
     for (let [key, value] of Object.entries(usersAsingPhase)) {
@@ -173,13 +189,18 @@ export class PhaseComponent implements OnInit {
   }*/
 
   public onAddNewPhase(phaseForm: NgForm): void {
-    let usersAsingPhase = this.createUsersAsigRequest();
+    let usersAsingPhase = this.createUsersAsingRequest();
+    let activitiesAsingPhase = this.createActivitieAsingRequest();
 
-    console.log('size before return ' + usersAsingPhase.length);
+
+    console.log('size before return usersAsingPhase ' + usersAsingPhase.length);
+    console.log('size before return  activitiesAsingPhase ' + activitiesAsingPhase.length);
 
     console.log(`new phase ${JSON.stringify(usersAsingPhase)}`);
     this.phaseToCreate = phaseForm.value;
     this.phaseToCreate.usersAsignedToPhase = usersAsingPhase;
+    this.phaseToCreate.activitiesAsingPhase = activitiesAsingPhase;
+
     console.log(JSON.stringify(this.phaseToCreate));
     this.subscriptions.push(
       this.phaseService.createPhases(this.phaseToCreate, this.authenticationService.getToken()).subscribe(
@@ -204,7 +225,7 @@ export class PhaseComponent implements OnInit {
     // Settings configuration
     this.mySettings = {
       enableSearch: true,
-      checkedStyle: 'fontawesome',
+      checkedStyle: 'checkboxes',
       buttonClasses: 'btn btn-default btn-block',
       //itemClasses: 'form-control',
       containerClasses: 'form-group',
@@ -221,15 +242,16 @@ export class PhaseComponent implements OnInit {
       searchPlaceholder: 'Find',
       searchEmptyResult: 'Nothing found...',
       searchNoRenderText: 'Type in search box to see results...',
-      defaultTitle: 'Asign Users',
+      defaultTitle: 'Choose multiple options...',
       allSelected: 'All selected',
     };
 
+
   }
 
-  public createUsersAsigRequest(): User[] {
+  public createUsersAsingRequest(): User[] {
     let userReturn: User[] = [];
-    this.optionsModel.forEach(option => {
+    this.selectedUsersToPhase.forEach(option => {
       this.users.forEach(user => {
         console.log(JSON.stringify('user -- ' + JSON.stringify(user)));
         if (option == user.idUser) {
@@ -238,6 +260,19 @@ export class PhaseComponent implements OnInit {
       });
     });
     return userReturn;
+  }
+
+  public createActivitieAsingRequest(): Activity[] {
+    let activityReturn: Activity[] = [];
+    this.selectedActivitiesToPhase.forEach(option => {
+      this.activities.forEach(activity => {
+        console.log(JSON.stringify('activity -- ' + JSON.stringify(activity)));
+        if (option == activity.idActivity) {
+          activityReturn.push(activity);
+        }
+      });
+    });
+    return activityReturn;
   }
 
   getDiffDays(sDate, eDate) {
@@ -255,6 +290,27 @@ export class PhaseComponent implements OnInit {
     return this.isAdmin || this.isManager;
   }
 
+  public getActivities(showNotification: boolean): void {
+    this.refreshing = true;
+    this.subscriptions.push(
+      this.activityService.getActivities().subscribe(
+        (response: Activity[]) => {
+          this.activities = response;
+          this.activitiesAviables = this.activities;
+          this.activitiesAviables.forEach(function (a) { a.id = a.idActivity, a.name = a.tittle });
+          console.log(JSON.stringify(this.activities));
+          this.refreshing = false;
+          if (showNotification) {
+            this.sendNotification(NotificationType.SUCCESS, `${response.length} Activities(s) loaded successfully.`);
+          }
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendNotification(NotificationType.ERROR, errorResponse.error.message);
+          this.refreshing = false;
+        }
+      )
+    );
+  }
 
 }
 

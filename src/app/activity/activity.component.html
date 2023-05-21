@@ -189,8 +189,8 @@
                 <div class="form-group">
                   <label for="usersAsign">Asign users</label>
                   <ngx-bootstrap-multiselect [options]="myOptions" [texts]="myTexts" [settings]="mySettings"
-                    [(ngModel)]="optionsModel" (ngModelChange)="onChange()" class="form-control"
-                    [ngModelOptions]="{standalone: true}" required></ngx-bootstrap-multiselect>
+                    [(ngModel)]="optionsModel" (ngModelChange)="onChange()" [ngModelOptions]="{standalone: true}"
+                    required></ngx-bootstrap-multiselect>
                 </div>
                 <div class="row">
                   <div class="col-6">
@@ -272,16 +272,15 @@
                 <div class="form-group">
                   <label for="usersAsignEdit">Asign users</label>
                   <ngx-bootstrap-multiselect [options]="myOptions" [texts]="myTexts" [settings]="mySettings"
-                    [(ngModel)]="optionsModel" (ngModelChange)="onChange()" class="form-control"
-                    [disabled]="!isAdminOrManager" [ngModelOptions]="{standalone: true}"
-                    required></ngx-bootstrap-multiselect>
+                    [(ngModel)]="optionsModel" (ngModelChange)="onChange()" [disabled]="!isAdminOrManager"
+                    [ngModelOptions]="{standalone: true}" required></ngx-bootstrap-multiselect>
                 </div>
                 <div class="row">
                   <div class="col-6">
                     <div class="mb-3">
                       <label for="startDurationEdit" class="form-label">Start Duration</label>
                       <input size="16" class="form-control" name="startDurationEdit" id="startDurationEdit"
-                        value="{{editActivity.startDuration}}" type="datetime-local" required
+                        value="editActivity.startDuration" type="datetime-local" required
                         [(ngModel)]="editActivity.startDuration">
                     </div>
                   </div>
@@ -289,8 +288,8 @@
                     <div class="mb-3">
                       <label for="endDurationEdit" class="form-label">End Duration</label>
                       <input size="16" class="form-control" name="endDurationEdit" id="endDurationEdit"
-                        value="{{editActivity.endDuration}}" type="datetime-local"
-                        [(ngModel)]="editActivity.endDuration" required>
+                        value="editActivity.endDuration" type="datetime-local" [(ngModel)]="editActivity.endDuration"
+                        required>
                     </div>
                   </div>
                 </div>
@@ -304,7 +303,7 @@
                   </div>
                   <div class="col-6">
                     <div class="mb-3">
-                      <label for="stateActivityEdit">state Phase</label>
+                      <label for="stateActivityEdit">state Activity</label>
                       <select name="stateActivityEdit" id="stateActivityEdit" required class="form-control" required
                         [(ngModel)]="activityStateSelected">
                         <option [ngValue]="activityState" *ngFor="let activityState of activityStates">
@@ -314,14 +313,14 @@
                     </div>
                   </div>
                 </div>
-
               </form>
             </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal"
-              id="closeEditUserModalButton">Close</button>
-            <button type="button" [disabled]="activityForm.invalid || !isAdminOrManager" class="btn btn-primary">Save
+              id="closeEditActivityModalButton">Close</button>
+            <button type="button" (click)="onUpdateActivity()" [disabled]="activityForm.invalid || !isAdminOrManager"
+              class="btn btn-primary">Save
               changes</button>
           </div>
         </div>

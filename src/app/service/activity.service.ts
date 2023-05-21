@@ -10,9 +10,16 @@ import { HeaderType } from '../enum/header-type.enum';
   providedIn: 'root'
 })
 export class ActivityService {
+
+
   private host = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
+
+  updateActivity(editActivity: Activity, token: string): Observable<Activity> {
+    let headers = new HttpHeaders().set('Content-Type', 'application/json').set(HeaderType.JWT_TOKEN, token);
+    return this.http.post<Activity>(`${this.host}/activity/update`, JSON.stringify(editActivity), { headers: headers });
+  }
 
   public getActivities(): Observable<Activity[]> {
     return this.http.get<Activity[]>(`${this.host}/activity/activities`);
@@ -25,5 +32,6 @@ export class ActivityService {
     let headers = new HttpHeaders().set('Content-Type', 'application/json').set(HeaderType.JWT_TOKEN, token);
     return this.http.post<Activity>(`${this.host}/activity/create`, JSON.stringify(activity), { headers: headers });
   }
+
 
 }
