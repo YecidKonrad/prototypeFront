@@ -6,7 +6,7 @@ import { User } from '../model/user';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { Role } from '../enum/role.enum';
 import { NotificationType } from '../enum/notification-type.enum';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpEvent, HttpEventType } from '@angular/common/http';
 import { PhaseService } from '../service/phase.service';
 import { Phase } from '../model/phase';
 import { StatePhase } from '../model/state-phase';
@@ -17,6 +17,8 @@ import { newArray } from '@angular/compiler/src/util';
 import { PhaseRequest } from '../model/phase-request';
 import { ActivityService } from '../service/activity.service';
 import { Activity } from '../model/activity';
+import { CustomHttpRespone } from '../model/custom-http-response';
+import { FileUploadStatus } from '../model/file-upload.status';
 
 @Component({
   selector: 'app-phase',
@@ -45,6 +47,8 @@ export class PhaseComponent implements OnInit {
   public activities: Activity[];
   myTexts1: IMultiSelectTexts;
   mySettings1: IMultiSelectSettings;
+  public fileStatus = new FileUploadStatus();
+  public profileImage: File;
 
   constructor(private router: Router, private authenticationService: AuthenticationService,
     private phaseService: PhaseService, private userService: UserService,

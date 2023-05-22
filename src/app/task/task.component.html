@@ -3,7 +3,7 @@
     <div class="col-md-4">
     </div>
     <div class="col-md-4">
-      <h5>Activity Management</h5>
+      <h5>Task Management</h5>
       <small *ngIf="titleAction$ | async as title">{{ title }}</small>
     </div>
     <div class="col-md-4">
@@ -22,16 +22,16 @@
           [routerLink]="['/phase/management']">
           <i class="fa fa-spinner"></i> Phases
         </a>
-        <a class="nav-item nav-link active ml-1" (click)="changeTitle('Tasks')" data-toggle="tab"
-          [routerLink]="['/task/management']">
-          <i class="fa fa-tasks"></i> Tasks
+        <a class="nav-item nav-link active ml-1" (click)="changeTitle('Activities')" data-toggle="tab"
+          [routerLink]="['/activity/management']">
+          <i class="fa fa-bolt"></i> Activities
         </a>
         <a [hidden]="!isAdmin" class="nav-item nav-link ml-3" (click)="changeTitle('Settings')" data-toggle="tab"
           href="#reset-password">
           <i class="fa fa-cogs"></i> Settings
         </a>
         <a class="nav-item nav-link move-right mr-3" (click)="changeTitle('Profile')" data-toggle="tab" href="#profile">
-          (Read Only) Welcome, {{user?.firstName}}
+          (Read Only Profile) Welcome, {{user?.firstName}}
           <i class="fa fa-user"></i>
         </a>
       </div>
@@ -40,21 +40,21 @@
 
   <!-- main content -->
   <div class="tab-content mt-3" id="myTabContent">
-    <!-- activity table -->
+    <!-- task table -->
     <div class="tab-pane fade show active" id="activities">
       <div class="mb-3 float-right">
         <div class="btn-group mr-2">
           <form class="form-inline my-2 my-lg-0 justify-content-center">
             <input name="searchTerm" #searchInput="" class="form-control mr-sm-2" ngModel
-              (ngModelChange)="searchActivities(searchInput.value)" type="search" placeholder="Search Activities...">
+              (ngModelChange)="searchTasks(searchInput.value)" type="search" placeholder="Search Tasks...">
           </form>
           <button [hidden]="!isAdmin" type="button" class="btn btn-info" data-toggle="modal"
-            data-target="#addActivityModal">
-            <i class="fa fa-plus"></i>New Activity
+            data-target="#addTaskModal">
+            <i class="fa fa-plus"></i>New Task
           </button>
         </div>
         <div class="btn-group">
-          <button type="button" (click)="getActivities(true)" class="btn btn-info">
+          <button type="button" (click)="getTasks(true)" class="btn btn-info">
             <i *ngIf="refreshing" class="fas fa-sync fa-spin"></i><i *ngIf="!refreshing" class="fas fa-sync"></i>
           </button>
         </div>
@@ -62,7 +62,7 @@
       <table class="table table-hover">
         <thead class="table-borderless">
           <tr class="text-center">
-            <th>idActivity</th>
+            <th>idTask</th>
             <th>tittle</th>
             <th>Created Date</th>
             <th>CreatedBy</th>
@@ -70,24 +70,22 @@
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody *ngFor="let activity of activities">
+        <tbody *ngFor="let task of tasks">
           <tr class="text-center">
-            <td (click)="onSelectActivity(activity)">{{activity?.idActivity}}</td>
-            <td (click)="onSelectActivity(activity)">{{activity?.tittle}}</td>
-            <td (click)="onSelectActivity(activity)">{{activity?.createdDate | date:'short'}}</td>
-            <td (click)="onSelectActivity(activity)">{{activity?.createdBy.email}}</td>
-            <td (click)="onSelectActivity(activity)">
-              <span *ngIf="activity?.stateActivity.idStateActivity ===1"
-                class="badge badge-warning">{{activity?.stateActivity.state}}</span>
-              <span *ngIf="activity?.stateActivity.idStateActivity ===2"
-                class="badge badge-info">{{activity?.stateActivity.state}}</span>
-              <span *ngIf="activity?.stateActivity.idStateActivity ===3"
-                class="badge badge-success">{{activity?.stateActivity.state}}</span>
+            <td (click)="onSelectTask(task)">{{task?.idTask}}</td>
+            <td (click)="onSelectTask(task)">{{task?.tittle}}</td>
+            <td (click)="onSelectTask(task)">{{task?.createdDate | date:'short'}}</td>
+            <td (click)="onSelectTask(task)">{{task?.createdBy.username}}</td>
+            <td (click)="onSelectTask(task)">
+              <span *ngIf="task?.stateTask.idStateTask ===1"
+                class="badge badge-warning">{{task?.stateTask.state}}</span>
+              <span *ngIf="task?.stateTask.idStateTask ===2" class="badge badge-info">{{task?.stateTask.state}}</span>
+              <span *ngIf="task?.stateTask.idStateTask ===3"
+                class="badge badge-success">{{task?.stateTask.state}}</span>
             </td>
             <td class="">
               <div class="btn-group">
-                <button class="btn btn-outline-info" (click)="onEditActivity(activity)"><i
-                    class="fas fa-edit"></i></button>
+                <button class="btn btn-outline-info" (click)="onEditTask(task)"><i class="fas fa-edit"></i></button>
                 <button [hidden]="!isAdmin" class="btn btn-outline-danger"><i class="fas fa-trash"></i></button>
               </div>
             </td>
@@ -95,20 +93,20 @@
         </tbody>
       </table>
     </div>
-    <button [hidden]="true" type="button" id="openActivityInfo" data-toggle="modal" data-target="#viewActivityModal">
+    <button [hidden]="true" type="button" id="openTaskInfo" data-toggle="modal" data-target="#viewTaskModal">
     </button>
-    <button [hidden]="true" type="button" id="openActivityEdit" data-toggle="modal" data-target="#editActivityModal">
+    <button [hidden]="true" type="button" id="openTaskEdit" data-toggle="modal" data-target="#editTaskModal">
     </button>
     <!-- user profile -->
 
-    <!-- Activity Phase info -->
-    <div class="modal fade bd-example-modal-lg" id="viewActivityModal" tabindex="-1" role="dialog" aria-labelledby=""
+    <!-- Task Phase info -->
+    <div class="modal fade bd-example-modal-lg" id="viewTaskModal" tabindex="-1" role="dialog" aria-labelledby=""
       aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5><span class="badge badge-primary"># {{selectedActivity?.idActivity}} </span>
-              {{selectedActivity?.tittle}}</h5>
+            <h5><span class="badge badge-primary"># {{selectedTask?.idTask}} </span>
+              {{selectedTask?.tittle}}</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -117,22 +115,22 @@
             <div>
               <div class="card">
                 <div class="">
-                  <div class="card-header text-center" *ngIf="selectedActivity?.endDuration"><small> End Duration :
+                  <div class="card-header text-center" *ngIf="selectedTask?.endDuration"><small> End Duration :
                     </small>
-                    <span class="badge badge-danger">{{selectedActivity?.endDuration | date:'short'}}</span>
+                    <span class="badge badge-danger">{{selectedTask?.endDuration | date:'short'}}</span>
                   </div>
                   <div class="card-body">
                     <div class="form-group">
                       <label for="phaseTextareaDescription">Description: </label>
-                      <textarea class="form-control" id="phaseTextareaDescription"
-                        value="{{selectedActivity?.description}}" rows="2" readonly></textarea>
+                      <textarea class="form-control" id="phaseTextareaDescription" value="{{selectedTask?.description}}"
+                        rows="2" readonly></textarea>
                     </div>
                     <div class="form-group">
                       <label for="phaseTextareaDescription">Created By: </label>
                       <input type="text" class="form-control" readonly
-                        value="{{selectedActivity?.createdBy.firstName}} {{selectedActivity?.createdBy.lastName}} - ({{selectedActivity?.createdBy.username}})">
+                        value="{{selectedTask?.createdBy.firstName}} {{selectedTask?.createdBy.lastName}} - ({{selectedTask?.createdBy.username}})">
                     </div>
-                    <h6 class="modal-title"> Users Asingned to Activity: </h6>
+                    <h6 class="modal-title"> Users Asingned to Task: </h6>
                     <table class="table table-hover">
                       <thead class="table-borderless">
                         <tr class="text-center">
@@ -141,7 +139,7 @@
                           <th>email</th>
                         </tr>
                       </thead>
-                      <tbody *ngFor="let usersAsined of selectedActivity?.usersAsignedToActivity">
+                      <tbody *ngFor="let usersAsined of selectedTask?.usersAsignedToTask">
                         <tr class="text-center">
                           <td>{{usersAsined?.firstName}} {{usersAsined?.lastName}}</td>
                           <td>{{usersAsined?.username}}</td>
@@ -151,9 +149,9 @@
                     </table>
                   </div>
                   <div class="card-footer text-center">
-                    {{selectedActivity?.createdDate | date:'short'}} -
-                    <span class="badge badge-pill badge-danger">{{getDiffDays(selectedActivity?.startDuration,
-                      selectedActivity?.endDuration)}}</span> Days To Finish.
+                    {{selectedTask?.createdDate | date:'short'}} -
+                    <span class="badge badge-pill badge-danger">{{getDiffDays(selectedTask?.startDuration,
+                      selectedTask?.endDuration)}}</span> Days To Finish.
                   </div>
                 </div>
               </div>
@@ -166,21 +164,21 @@
       </div>
     </div>
 
-    <!-- model add Activity -->
+    <!-- model add Task -->
 
-    <div [hidden]="!isAdmin" class="modal draggable fade bd-example-modal-lg" id="addActivityModal" tabindex="-1"
+    <div [hidden]="!isAdmin" class="modal draggable fade bd-example-modal-lg" id="addTaskModal" tabindex="-1"
       role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title text-center">Create Activity</h5>
+            <h5 class="modal-title text-center">Create Task</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             <div>
-              <form #newActivityForm="ngForm" (ngSubmit)="onAddNewActivity(newActivityForm)">
+              <form #newTaskForm="ngForm" (ngSubmit)="onAddNewTask(newTaskForm)">
                 <div class="form-group">
                   <label for="tittle">Tittle</label>
                   <input type="text" name="tittle" required ngModel class="form-control">
@@ -213,47 +211,40 @@
                   </div>
                 </div>
                 <div class="row">
-                  <div class="col-6">
+                  <div class="col-12">
                     <div class="mb-3">
-                      <label for="priority">Priority</label>
-                      <input type="number" name="priority" required class="form-control" required ngModel>
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <div class="mb-3">
-                      <label for="stateActivity">state Activity</label>
-                      <select name="stateActivity" id="stateActivity" required class="form-control" required
-                        [(ngModel)]="activityStateSelected">
-                        <option [ngValue]="activityState" *ngFor="let activityState of activityStates">
-                          {{activityState.state}}
+                      <label for="stateTask">state Task</label>
+                      <select name="stateTask" id="stateTask" required class="form-control" required
+                        [(ngModel)]="taskStateSelected">
+                        <option [ngValue]="taskState" *ngFor="let taskState of taskStates">
+                          {{taskState.state}}
                         </option>
                       </select>
                     </div>
                   </div>
                 </div>
-                <button type="submit" style="display: none;" id="new-activity-save"></button>
+                <button type="submit" style="display: none;" id="new-task-save"></button>
               </form>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal" id="new-activity-close">Close</button>
-            <button type="button" (click)="saveNewActivity()" [disabled]="newActivityForm.invalid"
-              class="btn btn-primary">Save
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" id="new-task-close">Close</button>
+            <button type="button" (click)="saveTask()" [disabled]="newTaskForm.invalid" class="btn btn-primary">Save
               changes</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- modal activity edit -->
+    <!-- modal task edit -->
 
-    <div class="modal draggable fade bd-example-modal-lg" id="editActivityModal" tabindex="-1" role="dialog"
+    <div class="modal draggable fade bd-example-modal-lg" id="editTaskModal" tabindex="-1" role="dialog"
       aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title text-center">Edit <span class="badge badge-primary"># {{editActivity?.idActivity}}
-              </span> {{editActivity?.tittle}} <small [hidden]="isAdminOrManager">
+            <h5 class="modal-title text-center">Edit <span class="badge badge-primary"># {{editTask?.idTask}}
+              </span> {{editTask?.tittle}} <small [hidden]="isAdminOrManager">
                 (read only)
               </small></h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -262,16 +253,16 @@
           </div>
           <div class="modal-body">
             <div class="">
-              <form #activityForm="ngForm">
+              <form #TaskForm="ngForm">
                 <div class="form-group">
-                  <label for="phaseEdit">Tittle</label>
-                  <input type="text" name="phaseEdit" [disabled]="!isAdminOrManager" required
-                    [(ngModel)]="editActivity.tittle" class="form-control">
+                  <label for="taskEdit">Tittle</label>
+                  <input type="text" name="taskEdit" [disabled]="!isAdminOrManager" required
+                    [(ngModel)]="editTask.tittle" class="form-control">
                 </div>
                 <div class="form-group">
                   <label for="descriptionEdit">Description</label>
                   <textarea class="form-control" name="descriptionEdit" [disabled]="!isAdminOrManager" id="description"
-                    rows="2" required [(ngModel)]="editActivity.description">{{editActivity.description}}</textarea>
+                    rows="2" required [(ngModel)]="editTask.description">{{editTask.description}}</textarea>
                 </div>
                 <div class="form-group">
                   <label for="usersAsignEdit">Asign users</label>
@@ -284,16 +275,15 @@
                     <div class="mb-3">
                       <label for="startDurationEdit" class="form-label">Start Duration</label>
                       <input size="16" class="form-control" name="startDurationEdit" id="startDurationEdit"
-                        value="editActivity.startDuration" type="datetime-local" required
-                        [(ngModel)]="editActivity.startDuration">
+                        value="editTask.startDuration" type="datetime-local" required
+                        [(ngModel)]="editTask.startDuration">
                     </div>
                   </div>
                   <div class="col-6">
                     <div class="mb-3">
                       <label for="endDurationEdit" class="form-label">End Duration</label>
                       <input size="16" class="form-control" name="endDurationEdit" id="endDurationEdit"
-                        value="editActivity.endDuration" type="datetime-local" [(ngModel)]="editActivity.endDuration"
-                        required>
+                        value="editTask.endDuration" type="datetime-local" [(ngModel)]="editTask.endDuration" required>
                     </div>
                   </div>
                 </div>
@@ -301,17 +291,17 @@
                   <div class="col-6">
                     <div class="mb-3">
                       <label for="orderingEdit">Priority</label>
-                      <input type="number" name="orderingEdit" value="{{editActivity.priority}}"
-                        [(ngModel)]="editActivity.priority" required class="form-control" required ngModel>
+                      <input type="number" name="orderingEdit" value="{{editTask.priority}}"
+                        [(ngModel)]="editTask.priority" required class="form-control" required ngModel>
                     </div>
                   </div>
                   <div class="col-6">
                     <div class="mb-3">
-                      <label for="stateActivityEdit">state Activity</label>
-                      <select name="stateActivityEdit" id="stateActivityEdit" required class="form-control" required
-                        [(ngModel)]="activityStateSelected">
-                        <option [ngValue]="activityState" *ngFor="let activityState of activityStates">
-                          {{activityState.state}}
+                      <label for="stateTaskEdit">state Task</label>
+                      <select name="stateTaskEdit" id="stateTaskEdit" required class="form-control" required
+                        [(ngModel)]="taskStateSelected">
+                        <option [ngValue]="taskState" *ngFor="let taskState of taskStates">
+                          {{taskState.state}}
                         </option>
                       </select>
                     </div>
@@ -322,8 +312,8 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal"
-              id="closeEditActivityModalButton">Close</button>
-            <button type="button" (click)="onUpdateActivity()" [disabled]="activityForm.invalid || !isAdminOrManager"
+              id="closeEditTaskModalButton">Close</button>
+            <button type="button" (click)="onUpdateTask()" [disabled]="TaskForm.invalid || !isAdminOrManager"
               class="btn btn-primary">Save
               changes</button>
           </div>
