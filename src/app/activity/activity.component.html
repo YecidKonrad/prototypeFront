@@ -101,7 +101,7 @@
     </button>
     <!-- user profile -->
 
-    <!-- Activity Phase info -->
+    <!-- Activity  info -->
     <div class="modal fade bd-example-modal-lg" id="viewActivityModal" tabindex="-1" role="dialog" aria-labelledby=""
       aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -131,6 +131,31 @@
                       <label for="phaseTextareaDescription">Created By: </label>
                       <input type="text" class="form-control" readonly
                         value="{{selectedActivity?.createdBy.firstName}} {{selectedActivity?.createdBy.lastName}} - ({{selectedActivity?.createdBy.username}})">
+                    </div>
+                    <div class="form-group">
+                      <label for="tasksForActivity">Tasks Asigned: </label>
+                      <details (open)="false" *ngFor="let taskAsined of selectedActivity?.tasksAsignedToActivity">
+                        <summary>
+                          <font style="vertical-align: inherit;">
+                            <font style="vertical-align: inherit;"><span class="badge badge-primary">#
+                                {{taskAsined?.idTask}}
+                              </span> {{taskAsined?.tittle}}</font>
+                          </font>
+                        </summary>
+                        <p>
+                          <font style="vertical-align: inherit;">
+                            <font style="vertical-align: inherit;">
+                              <span *ngIf="taskAsined?.stateTask.idStateTask ===1"
+                                class="badge badge-warning">{{taskAsined?.stateTask.state}}</span>
+                              <span *ngIf="taskAsined?.stateTask.idStateTask ===2"
+                                class="badge badge-info">{{taskAsined?.stateTask.state}}</span>
+                              <span *ngIf="taskAsined?.stateTask.idStateTask ===3"
+                                class="badge badge-success">{{taskAsined?.stateTask.state}}</span>
+                              {{taskAsined.description}}
+                            </font>
+                          </font>
+                        </p>
+                      </details>
                     </div>
                     <h6 class="modal-title"> Users Asingned to Activity: </h6>
                     <table class="table table-hover">
@@ -191,9 +216,10 @@
                     ngModel></textarea>
                 </div>
                 <div class="form-group">
-                  <label for="usersAsign">Asign users</label>
-                  <ngx-bootstrap-multiselect [options]="myOptions" [texts]="myTexts" [settings]="mySettings"
-                    [(ngModel)]="optionsModel" (ngModelChange)="onChange()" [ngModelOptions]="{standalone: true}"
+                  <label for="tasksAsign">Asign Tasks</label>
+                  <ngx-bootstrap-multiselect [options]="tasksAviables" [texts]="myTexts" [settings]="mySettings"
+                    id="tasksAsignEdit" name="tasksAsignEdit" [(ngModel)]="selectedTasksToActivity"
+                    (ngModelChange)="onChange()" [ngModelOptions]="{standalone: true}"
                     required></ngx-bootstrap-multiselect>
                 </div>
                 <div class="row">
@@ -230,6 +256,12 @@
                       </select>
                     </div>
                   </div>
+                </div>
+                <div class="form-group">
+                  <label for="usersAsign">Asign users</label>
+                  <ngx-bootstrap-multiselect [options]="usersAviables" [texts]="myTexts" [settings]="mySettings"
+                    [(ngModel)]="selectedUsersToActivity" (ngModelChange)="onChange()"
+                    [ngModelOptions]="{standalone: true}" required></ngx-bootstrap-multiselect>
                 </div>
                 <button type="submit" style="display: none;" id="new-activity-save"></button>
               </form>
@@ -274,10 +306,11 @@
                     rows="2" required [(ngModel)]="editActivity.description">{{editActivity.description}}</textarea>
                 </div>
                 <div class="form-group">
-                  <label for="usersAsignEdit">Asign users</label>
-                  <ngx-bootstrap-multiselect [options]="myOptions" [texts]="myTexts" [settings]="mySettings"
-                    [(ngModel)]="optionsModel" (ngModelChange)="onChange()" [disabled]="!isAdminOrManager"
-                    [ngModelOptions]="{standalone: true}" required></ngx-bootstrap-multiselect>
+                  <label for="tasksAsignEdit"></label>
+                  <ngx-bootstrap-multiselect [options]="tasksAviables" [texts]="myTexts" [settings]="mySettings"
+                    id="tasksAsignEdit" name="tasksAsignEdit" [(ngModel)]="selectedTasksToActivity"
+                    (ngModelChange)="onChange()" [ngModelOptions]="{standalone: true}"
+                    required></ngx-bootstrap-multiselect>
                 </div>
                 <div class="row">
                   <div class="col-6">
@@ -317,6 +350,13 @@
                     </div>
                   </div>
                 </div>
+                <div class="form-group">
+                  <label for="usersAsignEdit">Asign users</label>
+                  <ngx-bootstrap-multiselect [options]="usersAviables" [texts]="myTexts" [settings]="mySettings"
+                    id="usersAsignEdit" name="usersAsignEdit" [(ngModel)]="selectedUsersToActivity"
+                    (ngModelChange)="onChange()" [disabled]="!isAdminOrManager" [ngModelOptions]="{standalone: true}"
+                    required></ngx-bootstrap-multiselect>
+                </div>
               </form>
             </div>
           </div>
@@ -330,6 +370,5 @@
         </div>
       </div>
     </div>
-
   </div>
 </div>

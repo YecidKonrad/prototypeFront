@@ -90,7 +90,13 @@ export class PhaseComponent implements OnInit {
     this.subscriptions.push(
       this.phaseService.getPhases().subscribe(
         (response: Phase[]) => {
-          this.phases = response;
+          if (!this.isAdminOrManager) {
+            this.phases = response.filter(phase => {
+              return phase.usersAsignedToPhase.some(user => user.idUser === this.user.idUser);
+            });
+          } else {
+            this.phases = response;
+          }
           console.log('phases full ' + JSON.stringify(this.phases));
           this.refreshing = false;
           if (showNotification) {

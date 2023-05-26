@@ -84,7 +84,7 @@ export class UserComponent implements OnInit, OnDestroy {
 
   public onAddNewUser(userForm: NgForm): void {
     // console.log(JSON.stringify(userForm.value));
-    const formData = this.userService.createUserFormDate(null, userForm.value, this.profileImage);
+    const formData = this.userService.updateUserFormDate(null, userForm.value);
     this.subscriptions.push(
       this.userService.addUser(formData).subscribe(
         (response: User) => {
@@ -104,8 +104,7 @@ export class UserComponent implements OnInit, OnDestroy {
   }
 
   public onUpdateUser(): void {
-    const formData = this.userService.UpdateUserFormDate(this.currentUsername, this.editUser);
-    // console.log(JSON.stringify(formData.get))
+    const formData = this.userService.updateUserFormDate(this.currentUsername, this.editUser);
     this.subscriptions.push(
       this.userService.updateUser(formData).subscribe(
         (response: User) => {

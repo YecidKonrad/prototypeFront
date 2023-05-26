@@ -402,6 +402,10 @@
                   <input type="text" name="username" required ngModel class="form-control">
                 </div>
                 <div class="form-group">
+                  <label for="institution">Institution</label>
+                  <input type="text" name="institution" required ngModel class="form-control">
+                </div>
+                <div class="form-group">
                   <label for="identificationType">Identification Type <small [hidden]="isAdmin">(read
                       only)</small></label>
                   <select class="form-control" name="identificationType" [disabled]="!isAdmin"
@@ -413,7 +417,8 @@
                 </div>
                 <div class="form-group">
                   <label for="email">Email</label>
-                  <input type="email" name="email" required ngModel class="form-control">
+                  <input type="email" name="email" required ngModel class="form-control"
+                    pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}">
                 </div>
                 <div *ngIf="isAdmin" class="form-group">
                   <label for="authority">Role</label>
@@ -428,11 +433,6 @@
                 <div *ngIf="!isAdmin" class="form-group">
                   <label for="authority">Role</label>
                   <input type="text" name="role" required ngModel="USER" readonly class="form-control">
-                </div>
-                <div class="input-group mb-2">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text">Profile Picture </span>
-                  </div>
                 </div>
                 <fieldset class="form-group">
                   <div class="form-check">

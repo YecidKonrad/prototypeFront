@@ -18,22 +18,5 @@ export class User {
   public authorities: [];
   public identificationType: IdentificationType;
 
-  constructor() {
-    this.idUser = 0;
-    this.userId = '';
-    this.firstName = '';
-    this.lastName = '';
-    this.username = '';
-    this.email = '';
-    this.institution = '';
-    this.lastLoginDate = null;
-    this.lastLoginDateDisplay = null;
-    this.joinDate = null;
-    this.profileImageUrl = '';
-    this.active = false;
-    this.notLocked = false;
-    this.role = '';
-    this.authorities = [];
-    this.identificationType = null;
-  }
+
 }

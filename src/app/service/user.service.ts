@@ -57,6 +57,7 @@ export class UserService {
     formData.append('firstName', user.firstName);
     formData.append('lastName', user.lastName);
     formData.append('username', user.username);
+    formData.append('institution', user.institution);
     formData.append('identificationType', user.identificationType.toString());
     formData.append('email', user.email);
     formData.append('role', user.role);
@@ -66,7 +67,7 @@ export class UserService {
     return formData;
   }
 
-  public UpdateUserFormDate(loggedInUsername: string, user: User): FormData {
+  public updateUserFormDate(loggedInUsername: string, user: User): FormData {
     const formData = new FormData();
     formData.append('currentUsername', loggedInUsername);
     formData.append('firstName', user.firstName);

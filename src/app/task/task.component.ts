@@ -41,6 +41,7 @@ export class TaskComponent implements OnInit {
     private authenticationService: AuthenticationService, private userService: UserService) { }
 
   ngOnInit(): void {
+    this.user = this.authenticationService.getUserFromLocalCache();
     this.getTasks(true);
     this.getTasksStates();
     this.users = this.userService.getUsersFromLocalCache();
@@ -58,11 +59,18 @@ export class TaskComponent implements OnInit {
     this.subscriptions.push(
       this.taskService.getTasks().subscribe(
         (response: Task[]) => {
-          this.tasks = response;
+          if (!this.isAdminOrManager) {
+            this.tasks = response.filter(task => {
+              return task.usersAsignedToTask.some(user => user.idUser === this.user.idUser);
+            });
+          } else {
+            this.tasks = response;
+          }
+
           console.log(JSON.stringify(this.tasks));
           this.refreshing = false;
           if (showNotification) {
-            this.sendNotification(NotificationType.SUCCESS, `${response.length} Tasks(s) loaded successfully.`);
+            this.sendNotification(NotificationType.SUCCESS, `${this.tasks.length} Task(s) loaded successfully.`);
           }
         },
         (errorResponse: HttpErrorResponse) => {
@@ -72,6 +80,7 @@ export class TaskComponent implements OnInit {
       )
     );
   }
+
 
   public getTasksStates(): void {
     this.refreshing = true;
@@ -170,7 +179,7 @@ export class TaskComponent implements OnInit {
     this.subscriptions.push(
       this.taskService.updateTask(this.editTask, this.authenticationService.getToken()).subscribe(
         (response: Task) => {
-          this.clickButton('closeEditActivityModalButton');
+          this.clickButton('closeEditTaskModalButton');
           this.getTasks(false);
           this.sendNotification(NotificationType.SUCCESS, `${response.idTask} ${response.tittle} updated successfully`);
         },

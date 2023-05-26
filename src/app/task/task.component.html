@@ -287,24 +287,15 @@
                     </div>
                   </div>
                 </div>
-                <div class="row">
-                  <div class="col-6">
-                    <div class="mb-3">
-                      <label for="orderingEdit">Priority</label>
-                      <input type="number" name="orderingEdit" value="{{editTask.priority}}"
-                        [(ngModel)]="editTask.priority" required class="form-control" required ngModel>
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <div class="mb-3">
-                      <label for="stateTaskEdit">state Task</label>
-                      <select name="stateTaskEdit" id="stateTaskEdit" required class="form-control" required
-                        [(ngModel)]="taskStateSelected">
-                        <option [ngValue]="taskState" *ngFor="let taskState of taskStates">
-                          {{taskState.state}}
-                        </option>
-                      </select>
-                    </div>
+                <div class="form-group">
+                  <div class="mb-3">
+                    <label for="stateTaskEdit">state Task</label>
+                    <select name="stateTaskEdit" id="stateTaskEdit" required class="form-control" required
+                      [(ngModel)]="taskStateSelected">
+                      <option [ngValue]="taskState" *ngFor="let taskState of taskStates">
+                        {{taskState.state}}
+                      </option>
+                    </select>
                   </div>
                 </div>
               </form>

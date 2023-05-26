@@ -142,10 +142,10 @@
                       readonly value="No Activitys Realted">
                     <div id="accordion" *ngFor="let activity of selectedPhase?.activitiesAsingPhase;  let i = index">
                       <div class="card border border-secondary">
-                        <div class="card-header" id="'heading'+i">
+                        <div class="card-header" [id]="'heading'+i">
                           <h5 class="mb-0">
-                            <button class="btn btn-link" data-toggle="collapse" data-target="'#collapse'+i"
-                              aria-expanded="false" aria-controls="'collapse'+i">
+                            <button class="btn btn-link collapsed" data-toggle="collapse" data-target="'#collapse'+i"
+                              (aria-expanded)="true" aria-controls="'collapse'+i">
                               #{{activity?.idActivity}} {{activity?.tittle}}
                               <span *ngIf="activity?.stateActivity.idStateActivity ===1"
                                 class="badge badge-warning">{{activity?.stateActivity.state}}</span>
@@ -156,8 +156,7 @@
                             </button>
                           </h5>
                         </div>
-                        <div id="'collapse'+i" class="collapse show" aria-labelledby="'heading'+i"
-                          data-parent="#accordion">
+                        <div id="'collapse'+i" class="collapse" aria-labelledby="'heading'+i" data-parent="#accordion">
                           <div class="card-body">
                             {{activity?.description}}
                           </div>

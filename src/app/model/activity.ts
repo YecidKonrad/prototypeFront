@@ -1,4 +1,5 @@
 import { StateActivity } from "./state-activity";
+import { Task } from "./task";
 import { User } from "./user";
 
 export class Activity {
@@ -12,4 +13,5 @@ export class Activity {
   public stateActivity: StateActivity;
   public createdBy: User;
   public usersAsignedToActivity: User[];
+  public tasksAsignedToActivity: Task[];
 }

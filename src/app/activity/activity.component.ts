@@ -6,15 +6,15 @@ import { NotificationService } from '../service/notification.service';
 import { NotificationType } from '../enum/notification-type.enum';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Phase } from '../model/phase';
-import { StatePhase } from '../model/state-phase';
 import { User } from '../model/user';
-import { IMultiSelectOption, IMultiSelectSettings, IMultiSelectTexts } from 'ngx-bootstrap-multiselect';
-import { PhaseRequest } from '../model/phase-request';
+import { IMultiSelectSettings, IMultiSelectTexts } from 'ngx-bootstrap-multiselect';
 import { Role } from '../enum/role.enum';
 import { AuthenticationService } from '../service/authentication.service';
 import { StateActivity } from '../model/state-activity';
 import { NgForm } from '@angular/forms';
 import { UserService } from '../service/user.service';
+import { Task } from '../model/task';
+import { TaskService } from '../service/task.service';
 
 @Component({
   selector: 'app-activity',
@@ -34,22 +34,28 @@ export class ActivityComponent implements OnInit {
   public selectedActivity: Activity;
   public editActivity = new Activity();
   public activityStateSelected: StateActivity;
-  public optionsModel: number[];
-  public myOptions;
+  public selectedUsersToActivity: number[];
+  public usersAviables: any;
   myTexts: IMultiSelectTexts;
   mySettings: IMultiSelectSettings;
   activityToCreate: Activity;
+  public tasks: Task[];
+  public selectedTasksToActivity: number[];
+  public tasksAviables: any;
+
   constructor(private activityService: ActivityService, private notificationService: NotificationService,
-    private authenticationService: AuthenticationService, private userService: UserService) { }
+    private authenticationService: AuthenticationService, private userService: UserService, private taskService: TaskService) { }
 
   ngOnInit(): void {
+    this.user = this.authenticationService.getUserFromLocalCache();
     this.getActivities(true);
     this.getActivityStates();
     this.users = this.userService.getUsersFromLocalCache();
     console.log(JSON.stringify(this.users))
     this.loadConfigs();
-    this.myOptions = this.users;
-    this.myOptions.forEach(function (e) { e.id = e.idUser, e.name = e.username });
+    this.usersAviables = this.users;
+    this.usersAviables.forEach(function (e) { e.id = e.idUser, e.name = e.username });
+    this.getTasks(false);
   }
 
   public getActivities(showNotification: boolean): void {
@@ -57,7 +63,13 @@ export class ActivityComponent implements OnInit {
     this.subscriptions.push(
       this.activityService.getActivities().subscribe(
         (response: Activity[]) => {
-          this.activities = response;
+          if (!this.isAdminOrManager) {
+            this.activities = response.filter(activity => {
+              return activity.usersAsignedToActivity.some(user => user.idUser === this.user.idUser);
+            });
+          } else {
+            this.activities = response;
+          }
           console.log(JSON.stringify(this.activities));
           this.refreshing = false;
           if (showNotification) {
@@ -89,13 +101,13 @@ export class ActivityComponent implements OnInit {
   }
 
   public onAddNewActivity(activityForm: NgForm): void {
-    let usersAsingPhase = this.createUsersAsigRequest();
-
-    console.log('size before return ' + usersAsingPhase.length);
-
-    console.log(`new activity ${JSON.stringify(usersAsingPhase)}`);
+    let usersAsingTasks = this.createUsersAsingRequest();
+    let tasksAsignedToActivity = this.createTasksAsingRequest();
+    console.log('size before return ' + usersAsingTasks.length);
+    console.log(`new activity ${JSON.stringify(usersAsingTasks)}`);
     this.activityToCreate = activityForm.value;
-    this.activityToCreate.usersAsignedToActivity = usersAsingPhase;
+    this.activityToCreate.usersAsignedToActivity = usersAsingTasks;
+    this.activityToCreate.tasksAsignedToActivity = tasksAsignedToActivity;
     console.log(JSON.stringify(this.activityToCreate));
     this.subscriptions.push(
       this.activityService.createActivities(this.activityToCreate, this.authenticationService.getToken()).subscribe(
@@ -165,14 +177,25 @@ export class ActivityComponent implements OnInit {
 
   public onEditActivity(editActivity: Activity): void {
     this.editActivity = editActivity;
+    console.log('asignados edit ' + JSON.stringify(this.editActivity.usersAsignedToActivity))
     //FILTER THE USER ASIGNED PREVIUS
-    /* this.editActivity.usersAsignedToActivity.forEach(user => {
-       this.myOptions = this.users.filter(us => us.username == user.username);
-     });*/
-    // this.myOptions.forEach(function (e) { e.id = e.idUser, e.name = e.username });
+    console.log('my options a ' + JSON.stringify(this.usersAviables));
+    this.editActivity.usersAsignedToActivity.forEach(user => {
+      this.users.forEach(usr => {
+        if (user.idUser === usr.idUser) {
+          const index = this.usersAviables.indexOf(usr);
+          if (index !== -1) {
+            this.usersAviables.splice(index, 1);
+          }
+        }
+      });
+    });
+    console.log('my options b ' + JSON.stringify(this.usersAviables));
+    this.usersAviables.forEach(function (e) { e.id = e.idUser, e.name = e.username });
     // this.setPosibleStates(editActivity.stateActivity);
     this.clickButton('openActivityEdit');
   }
+
   getDiffDays(sDate, eDate) {
     var startDate = new Date(sDate);
     var endDate = new Date(eDate);
@@ -181,12 +204,12 @@ export class ActivityComponent implements OnInit {
     return Math.ceil(Math.abs(Time) / (1000 * 60 * 60 * 24));
   }
   onChange() {
-    console.log(this.optionsModel);
+    console.log(this.selectedUsersToActivity);
   }
 
-  public createUsersAsigRequest(): User[] {
+  public createUsersAsingRequest(): User[] {
     let userReturn: User[] = [];
-    this.optionsModel.forEach(option => {
+    this.selectedUsersToActivity.forEach(option => {
       this.users.forEach(user => {
         console.log(JSON.stringify('user -- ' + JSON.stringify(user)));
         if (option == user.idUser) {
@@ -197,6 +220,18 @@ export class ActivityComponent implements OnInit {
     return userReturn;
   }
 
+  public createTasksAsingRequest(): Task[] {
+    let taskReturn: Task[] = [];
+    this.selectedTasksToActivity.forEach(option => {
+      this.tasks.forEach(task => {
+        console.log(JSON.stringify('tasak -- ' + JSON.stringify(task)));
+        if (option == task.idTask) {
+          taskReturn.push(task);
+        }
+      });
+    });
+    return taskReturn;
+  }
   public saveNewActivity(): void {
     this.clickButton('new-activity-save');
   }
@@ -222,7 +257,7 @@ export class ActivityComponent implements OnInit {
       searchPlaceholder: 'Find',
       searchEmptyResult: 'Nothing found...',
       searchNoRenderText: 'Type in search box to see results...',
-      defaultTitle: 'Asign Users',
+      defaultTitle: 'Choose multiple options...',
       allSelected: 'All selected',
     };
 
@@ -237,6 +272,7 @@ export class ActivityComponent implements OnInit {
     // console.log(JSON.stringify(formData.get))
     console.log(JSON.stringify(this.activityStateSelected))
     this.editActivity.stateActivity = this.activityStateSelected;
+    this.editActivity.usersAsignedToActivity = this.createUsersAsingRequest();
     this.subscriptions.push(
       this.activityService.updateActivity(this.editActivity, this.authenticationService.getToken()).subscribe(
         (response: Activity) => {
@@ -246,6 +282,28 @@ export class ActivityComponent implements OnInit {
         },
         (errorResponse: HttpErrorResponse) => {
           this.sendNotification(NotificationType.ERROR, errorResponse.error.message);
+        }
+      )
+    );
+  }
+
+  public getTasks(showNotification: boolean): void {
+    this.refreshing = true;
+    this.subscriptions.push(
+      this.taskService.getTasks().subscribe(
+        (response: Task[]) => {
+          this.tasks = response;
+          this.tasksAviables = this.tasks;
+          this.tasksAviables.forEach(function (e) { e.id = e.idTask, e.name = '[' + e.idTask + ']' + ' ' + e.tittle });
+          console.log(JSON.stringify(this.tasks));
+          this.refreshing = false;
+          if (showNotification) {
+            this.sendNotification(NotificationType.SUCCESS, `${response.length} Tasks(s) loaded successfully.`);
+          }
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendNotification(NotificationType.ERROR, errorResponse.error.message);
+          this.refreshing = false;
         }
       )
     );
