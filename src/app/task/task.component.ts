@@ -31,11 +31,13 @@ export class TaskComponent implements OnInit {
   public selectedTask: Task;
   public editTask = new Task();
   public taskStateSelected: StateTask;
-  public optionsModel: number[];
-  public myOptions;
+  // public optionsModel: number[];
+  public usersAviables;
   myTexts: IMultiSelectTexts;
   mySettings: IMultiSelectSettings;
   taskToCreate: Task;
+  usersAviablesForEdit: any;
+  selectedUsersToTask: any;
 
   constructor(private taskService: TaskService, private notificationService: NotificationService,
     private authenticationService: AuthenticationService, private userService: UserService) { }
@@ -47,8 +49,8 @@ export class TaskComponent implements OnInit {
     this.users = this.userService.getUsersFromLocalCache();
     console.log(JSON.stringify(this.users))
     this.loadConfigs();
-    this.myOptions = this.users;
-    this.myOptions.forEach(function (e) { e.id = e.idUser, e.name = e.username });
+    this.usersAviables = this.users;
+    this.usersAviables.forEach(function (e) { e.id = e.idUser, e.name = e.username });
   }
   public changeTitle(title: string): void {
     this.titleSubject.next(title);
@@ -100,7 +102,7 @@ export class TaskComponent implements OnInit {
   }
 
   public onAddNewTask(taskForm: NgForm): void {
-    let usersAsingPhase = this.createUsersAsigRequest();
+    let usersAsingPhase = this.createUsersAsingRequest();
 
     console.log('size before return ' + usersAsingPhase.length);
 
@@ -130,19 +132,6 @@ export class TaskComponent implements OnInit {
     }
   }
 
-  public createUsersAsigRequest(): User[] {
-    let userReturn: User[] = [];
-    this.optionsModel.forEach(option => {
-      this.users.forEach(user => {
-        console.log(JSON.stringify('user -- ' + JSON.stringify(user)));
-        if (option == user.idUser) {
-          userReturn.push(user);
-        }
-      });
-    });
-    return userReturn;
-  }
-
   private clickButton(buttonId: string): void {
     document.getElementById(buttonId).click();
   }
@@ -150,11 +139,15 @@ export class TaskComponent implements OnInit {
   public onEditTask(editTask: Task): void {
     this.editTask = editTask;
     //FILTER THE USER ASIGNED PREVIUS
-    /* this.editActivity.usersAsignedToActivity.forEach(user => {
-       this.myOptions = this.users.filter(us => us.username == user.username);
-     });*/
-    // this.myOptions.forEach(function (e) { e.id = e.idUser, e.name = e.username });
-    // this.setPosibleStates(editActivity.stateActivity);
+    this.usersAviablesForEdit = this.usersAviables.filter(user => {
+      return !this.editTask.usersAsignedToTask.some(assignedUser => assignedUser.idUser === user.idUser);
+    });
+
+    console.log('my options b ' + JSON.stringify(this.usersAviablesForEdit));
+    this.usersAviables.forEach(e => {
+      e.id = e.idUser;
+      e.name = e.username;
+    });
     this.clickButton('openTaskEdit');
   }
   getDiffDays(sDate, eDate) {
@@ -165,7 +158,7 @@ export class TaskComponent implements OnInit {
     return Math.ceil(Math.abs(Time) / (1000 * 60 * 60 * 24));
   }
   onChange() {
-    console.log(this.optionsModel);
+    console.log(this.selectedUsersToTask);
   }
 
   public saveTask(): void {
@@ -176,6 +169,7 @@ export class TaskComponent implements OnInit {
     // console.log(JSON.stringify(formData.get))
     console.log(JSON.stringify(this.taskStateSelected))
     this.editTask.stateTask = this.taskStateSelected;
+    this.editTask.usersAsignedToTask = this.createUsersAsingRequest();
     this.subscriptions.push(
       this.taskService.updateTask(this.editTask, this.authenticationService.getToken()).subscribe(
         (response: Task) => {
@@ -226,8 +220,18 @@ export class TaskComponent implements OnInit {
     this.selectedTask = selectedTask;
     this.clickButton('openTaskInfo');
   }
-
-
+  public createUsersAsingRequest(): User[] {
+    let userReturn: User[] = [];
+    this.selectedUsersToTask.forEach(option => {
+      this.users.forEach(user => {
+        console.log(JSON.stringify('user -- ' + JSON.stringify(user)));
+        if (option == user.idUser) {
+          userReturn.push(user);
+        }
+      });
+    });
+    return userReturn;
+  }
   public loadConfigs(): void {
     // Settings configuration
     this.mySettings = {
@@ -253,5 +257,7 @@ export class TaskComponent implements OnInit {
       allSelected: 'All selected',
     };
 
+
   }
+
 }

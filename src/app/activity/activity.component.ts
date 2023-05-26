@@ -42,6 +42,7 @@ export class ActivityComponent implements OnInit {
   public tasks: Task[];
   public selectedTasksToActivity: number[];
   public tasksAviables: any;
+  public usersAviablesForEdit: any;
 
   constructor(private activityService: ActivityService, private notificationService: NotificationService,
     private authenticationService: AuthenticationService, private userService: UserService, private taskService: TaskService) { }
@@ -177,24 +178,21 @@ export class ActivityComponent implements OnInit {
 
   public onEditActivity(editActivity: Activity): void {
     this.editActivity = editActivity;
-    console.log('asignados edit ' + JSON.stringify(this.editActivity.usersAsignedToActivity))
-    //FILTER THE USER ASIGNED PREVIUS
-    console.log('my options a ' + JSON.stringify(this.usersAviables));
-    this.editActivity.usersAsignedToActivity.forEach(user => {
-      this.users.forEach(usr => {
-        if (user.idUser === usr.idUser) {
-          const index = this.usersAviables.indexOf(usr);
-          if (index !== -1) {
-            this.usersAviables.splice(index, 1);
-          }
-        }
-      });
+    console.log('asignados edit ' + JSON.stringify(this.editActivity.usersAsignedToActivity));
+
+    this.usersAviablesForEdit = this.usersAviables.filter(user => {
+      return !this.editActivity.usersAsignedToActivity.some(assignedUser => assignedUser.idUser === user.idUser);
     });
+
     console.log('my options b ' + JSON.stringify(this.usersAviables));
-    this.usersAviables.forEach(function (e) { e.id = e.idUser, e.name = e.username });
-    // this.setPosibleStates(editActivity.stateActivity);
+    this.usersAviables.forEach(e => {
+      e.id = e.idUser;
+      e.name = e.username;
+    });
+
     this.clickButton('openActivityEdit');
   }
+
 
   getDiffDays(sDate, eDate) {
     var startDate = new Date(sDate);
@@ -293,12 +291,17 @@ export class ActivityComponent implements OnInit {
       this.taskService.getTasks().subscribe(
         (response: Task[]) => {
           this.tasks = response;
-          this.tasksAviables = this.tasks;
-          this.tasksAviables.forEach(function (e) { e.id = e.idTask, e.name = '[' + e.idTask + ']' + ' ' + e.tittle });
+          this.tasksAviables = this.tasks.filter(task => {
+            return task.stateTask.state !== 'Finalizada';
+          });
+          this.tasksAviables.forEach(e => {
+            e.id = e.idTask;
+            e.name = '[' + e.idTask + ']' + ' ' + e.tittle + ' ' + '[' + e.stateTask.state + ']';
+          });
           console.log(JSON.stringify(this.tasks));
           this.refreshing = false;
           if (showNotification) {
-            this.sendNotification(NotificationType.SUCCESS, `${response.length} Tasks(s) loaded successfully.`);
+            this.sendNotification(NotificationType.SUCCESS, `${this.tasks.length} Task(s) loaded successfully.`);
           }
         },
         (errorResponse: HttpErrorResponse) => {
@@ -308,4 +311,6 @@ export class ActivityComponent implements OnInit {
       )
     );
   }
+
+
 }

@@ -30,4 +30,11 @@ export class PhaseService {
     return this.http.post<Phase>(`${this.host}/phase/create`, JSON.stringify(phase), { headers: headers });
   }
 
+  public updatePhase(editPhase: Phase, token: string): Observable<Phase> {
+    console.log('En el service ' + JSON.stringify(editPhase));
+    let headers = new HttpHeaders().set('Content-Type', 'application/json').set(HeaderType.JWT_TOKEN, token);
+    return this.http.post<Phase>(`${this.host}/phase/update`, JSON.stringify(editPhase), { headers: headers });
+  }
+
+
 }

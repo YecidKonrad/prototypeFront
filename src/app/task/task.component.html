@@ -190,8 +190,8 @@
                 </div>
                 <div class="form-group">
                   <label for="usersAsign">Asign users</label>
-                  <ngx-bootstrap-multiselect [options]="myOptions" [texts]="myTexts" [settings]="mySettings"
-                    [(ngModel)]="optionsModel" (ngModelChange)="onChange()" [ngModelOptions]="{standalone: true}"
+                  <ngx-bootstrap-multiselect [options]="usersAviables" [texts]="myTexts" [settings]="mySettings"
+                    [(ngModel)]="selectedUsersToTask" (ngModelChange)="onChange()" [ngModelOptions]="{standalone: true}"
                     required></ngx-bootstrap-multiselect>
                 </div>
                 <div class="row">
@@ -266,8 +266,8 @@
                 </div>
                 <div class="form-group">
                   <label for="usersAsignEdit">Asign users</label>
-                  <ngx-bootstrap-multiselect [options]="myOptions" [texts]="myTexts" [settings]="mySettings"
-                    [(ngModel)]="optionsModel" (ngModelChange)="onChange()" [disabled]="!isAdminOrManager"
+                  <ngx-bootstrap-multiselect [options]="usersAviablesForEdit" [texts]="myTexts" [settings]="mySettings"
+                    [(ngModel)]="selectedUsersToTask" (ngModelChange)="onChange()" [disabled]="!isAdminOrManager"
                     [ngModelOptions]="{standalone: true}" required></ngx-bootstrap-multiselect>
                 </div>
                 <div class="row">
@@ -275,15 +275,14 @@
                     <div class="mb-3">
                       <label for="startDurationEdit" class="form-label">Start Duration</label>
                       <input size="16" class="form-control" name="startDurationEdit" id="startDurationEdit"
-                        value="editTask.startDuration" type="datetime-local" required
-                        [(ngModel)]="editTask.startDuration">
+                        [ngModel]="editTask.startDuration | date:'yyyy-MM-ddTHH:mm'" type="datetime-local" required>
                     </div>
                   </div>
                   <div class="col-6">
                     <div class="mb-3">
                       <label for="endDurationEdit" class="form-label">End Duration</label>
                       <input size="16" class="form-control" name="endDurationEdit" id="endDurationEdit"
-                        value="editTask.endDuration" type="datetime-local" [(ngModel)]="editTask.endDuration" required>
+                        [ngModel]="editTask.endDuration | date:'yyyy-MM-ddTHH:mm'" type="datetime-local" required>
                     </div>
                   </div>
                 </div>

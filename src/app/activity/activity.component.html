@@ -318,15 +318,14 @@
                       <label for="startDurationEdit" class="form-label">Start Duration</label>
                       <input size="16" class="form-control" name="startDurationEdit" id="startDurationEdit"
                         value="editActivity.startDuration" type="datetime-local" required
-                        [(ngModel)]="editActivity.startDuration">
+                        [ngModel]="editActivity.startDuration | date:'yyyy-MM-ddTHH:mm'">
                     </div>
                   </div>
                   <div class="col-6">
                     <div class="mb-3">
                       <label for="endDurationEdit" class="form-label">End Duration</label>
                       <input size="16" class="form-control" name="endDurationEdit" id="endDurationEdit"
-                        value="editActivity.endDuration" type="datetime-local" [(ngModel)]="editActivity.endDuration"
-                        required>
+                        type="datetime-local" [ngModel]="editActivity.endDuration | date:'yyyy-MM-ddTHH:mm'" required>
                     </div>
                   </div>
                 </div>
@@ -352,7 +351,7 @@
                 </div>
                 <div class="form-group">
                   <label for="usersAsignEdit">Asign users</label>
-                  <ngx-bootstrap-multiselect [options]="usersAviables" [texts]="myTexts" [settings]="mySettings"
+                  <ngx-bootstrap-multiselect [options]="usersAviablesForEdit" [texts]="myTexts" [settings]="mySettings"
                     id="usersAsignEdit" name="usersAsignEdit" [(ngModel)]="selectedUsersToActivity"
                     (ngModelChange)="onChange()" [disabled]="!isAdminOrManager" [ngModelOptions]="{standalone: true}"
                     required></ngx-bootstrap-multiselect>

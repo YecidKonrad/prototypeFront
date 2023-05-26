@@ -49,6 +49,7 @@ export class PhaseComponent implements OnInit {
   mySettings1: IMultiSelectSettings;
   public fileStatus = new FileUploadStatus();
   public profileImage: File;
+  public usersAviablesForEdit: any[];
 
   constructor(private router: Router, private authenticationService: AuthenticationService,
     private phaseService: PhaseService, private userService: UserService,
@@ -162,41 +163,14 @@ export class PhaseComponent implements OnInit {
 
   public onEditPhase(editPhase: Phase): void {
     this.editPhase = editPhase;
-    // this.currentUsername = editUser.username;
+    this.usersAviablesForEdit = this.usersAviables.filter(user => {
+      return !this.editPhase.usersAsignedToPhase.some(assignedUser => assignedUser.idUser === user.idUser);
+    });
     this.clickButton('openUserEdit');
   }
   private clickButton(buttonId: string): void {
     document.getElementById(buttonId).click();
   }
-
-  /*public onAddNewPhase(phaseForm: NgForm): void {
-
-    let usersAsingPhase = this.createUsersAsingRequest();
-    let usersAsingPhaseMap = new Map<number, string>();
-    // Iterar a través de las entradas del mapa y agregarlas al nuevo mapa
-    for (let [key, value] of Object.entries(usersAsingPhase)) {
-      usersAsingPhaseMap.set(parseInt(key), value);
-    }
-    console.log('size before return ' + usersAsingPhase.size);
-    this.phaseToCreate = phaseForm.value;
-    this.phaseToCreate.usersAsignedToPhase = usersAsingPhaseMap;
-    /* const newPhase = new PhaseRequest();
-     newPhase.usersAsignedToPhase = new Map(Array.from(usersAsingPhaseMap.entries()));
-     console.log(JSON.stringify('new phase ' + JSON.stringify(newPhase)));
-    console.log(JSON.stringify(this.phaseToCreate));
-    this.subscriptions.push(
-      this.phaseService.createPhases(this.phaseToCreate, this.authenticationService.getToken()).subscribe(
-        (response: Phase) => {
-          this.clickButton('new-phase-close');
-          phaseForm.reset();
-          this.sendNotification(NotificationType.SUCCESS, `# ${response.idPhase} ${response.phase} added successfully`);
-        },
-        (errorResponse: HttpErrorResponse) => {
-          this.sendNotification(NotificationType.ERROR, errorResponse.error.message);
-        }
-      )
-    );
-  }*/
 
   public onAddNewPhase(phaseForm: NgForm): void {
     let usersAsingPhase = this.createUsersAsingRequest();
@@ -306,8 +280,14 @@ export class PhaseComponent implements OnInit {
       this.activityService.getActivities().subscribe(
         (response: Activity[]) => {
           this.activities = response;
-          this.activitiesAviables = this.activities;
-          this.activitiesAviables.forEach(function (a) { a.id = a.idActivity, a.name = a.tittle });
+          //  this.activitiesAviables = this.activities;
+          this.activitiesAviables = this.activities.filter(activity => {
+            return activity.stateActivity.state !== 'Finalizada';
+          });
+          this.activitiesAviables.forEach(e => {
+            e.id = e.idActivity;
+            e.name = '[' + e.idActivity + ']' + ' ' + e.tittle + ' ' + '[' + e.stateActivity.state + ']';
+          });
           console.log(JSON.stringify(this.activities));
           this.refreshing = false;
           if (showNotification) {
@@ -317,6 +297,26 @@ export class PhaseComponent implements OnInit {
         (errorResponse: HttpErrorResponse) => {
           this.sendNotification(NotificationType.ERROR, errorResponse.error.message);
           this.refreshing = false;
+        }
+      )
+    );
+  }
+
+  public onUpdatePhase(): void {
+
+    console.log(JSON.stringify(this.phaseStateSelected))
+    this.editPhase.statePhase = this.phaseStateSelected;
+    this.editPhase.usersAsignedToPhase = this.createUsersAsingRequest();
+    this.editPhase.activitiesAsingPhase = this.createActivitieAsingRequest();
+    this.subscriptions.push(
+      this.phaseService.updatePhase(this.editPhase, this.authenticationService.getToken()).subscribe(
+        (response: Phase) => {
+          this.clickButton('closeEditPhaseModalButton');
+          this.getPhases(false);
+          this.sendNotification(NotificationType.SUCCESS, `${response.idPhase} ${response.phase} updated successfully`);
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendNotification(NotificationType.ERROR, errorResponse.error.message);
         }
       )
     );
