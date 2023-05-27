@@ -1,5 +1,5 @@
-<<<<<<< HEAD
-# Supportportalapp
+
+# prototypeFront
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.1.5.
 
@@ -26,6 +26,4 @@ Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protrac
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
-=======
-# prototypeFront
->>>>>>> 20051558e6ce9c2a31b3723340b31f5a00806c1f
+
