@@ -17,6 +17,4 @@ export class User {
   public role: string;
   public authorities: [];
   public identificationType: IdentificationType;
-
-
 }

@@ -58,7 +58,7 @@
               <span class="input-group-text"><i class="fa fa-suitcase"></i></span>
             </div>
             <select class="form-control" name="identificationType" #idIdentificationTypeInput="ngModel"
-              placeholder="Identification type" required ngModel>
+              placeholder="Identification type" required [(ngModel)]="identificationTypeSelected.idIdentificationType">
               <option [value]="identificationType.idIdentificationType"
                 *ngFor="let identificationType of identificationTypes">
                 {{identificationType.identification}}</option>

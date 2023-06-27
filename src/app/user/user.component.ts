@@ -84,7 +84,7 @@ export class UserComponent implements OnInit, OnDestroy {
 
   public onAddNewUser(userForm: NgForm): void {
     // console.log(JSON.stringify(userForm.value));
-    const formData = this.userService.updateUserFormDate(null, userForm.value);
+    const formData = this.userService.createUserFormDate(null, userForm.value, null);
     this.subscriptions.push(
       this.userService.addUser(formData).subscribe(
         (response: User) => {

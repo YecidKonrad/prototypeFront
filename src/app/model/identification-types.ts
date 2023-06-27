@@ -1,5 +1,5 @@
 export class IdentificationType {
-  idIdentificationType: number;
-  identification: string;
-  name: string;
+  public idIdentificationType: number;
+  public identification: string;
+  public name: string;
 }

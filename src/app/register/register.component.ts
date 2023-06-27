@@ -19,6 +19,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
   lista: any[] = [1, 2];
   public identificationTypes: IdentificationType[];
+  public identificationTypeSelected: IdentificationType = new IdentificationType();
 
   constructor(private router: Router, private authenticationService: AuthenticationService,
     private notificationService: NotificationService, private userService: UserService) { }
@@ -32,7 +33,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   public onRegister(user: User): void {
     this.showLoading = true;
-    console.log('user -> ' + JSON.stringify(user))
+    console.log(JSON.stringify(this.identificationTypeSelected));
+    user.identificationType = this.identificationTypeSelected;
+    console.log('user -> ' + JSON.stringify(user));
     this.subscriptions.push(
       this.authenticationService.register(user).subscribe(
         (response: User) => {

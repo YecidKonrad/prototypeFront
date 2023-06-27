@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Activity } from '../model/activity';
 import { Observable } from 'rxjs';
@@ -33,5 +33,9 @@ export class ActivityService {
     return this.http.post<Activity>(`${this.host}/activity/create`, JSON.stringify(activity), { headers: headers });
   }
 
+  generateExcel(): Observable<any> {
+    const url = `${this.host}/activity/generateExcel`;
+    return this.http.get(url, { responseType: 'json' });
+  }
 
 }

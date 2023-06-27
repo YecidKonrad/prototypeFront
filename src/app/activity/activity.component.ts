@@ -312,5 +312,49 @@ export class ActivityComponent implements OnInit {
     );
   }
 
+  downloadExcel(): void {
+    this.activityService.generateExcel().subscribe(
+      (response: any) => {
+        const fileContent = response.fileContent;
+        const fileName = response.fileName;
+
+        // Decodificar el contenido del archivo
+        const decodedContent = atob(fileContent);
+
+        // Convertir el contenido decodificado a un arreglo de bytes
+        const byteCharacters = Array.from(decodedContent).map((char) => char.charCodeAt(0));
+        const byteArray = new Uint8Array(byteCharacters);
+
+        // Crear el objeto Blob con el contenido del archivo y el tipo MIME adecuado
+        const blob = new Blob([byteArray], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+        // Crear la URL del objeto Blob
+        const url = window.URL.createObjectURL(blob);
+
+        // Crear un elemento <a> para simular el clic en el enlace de descarga
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        link.target = '_blank';
+
+        // Simular el clic en el enlace de descarga
+        link.click();
+
+        // Liberar la URL del objeto Blob
+        window.URL.revokeObjectURL(url);
+      },
+      (error: any) => {
+        console.error('Error downloading Excel file:', error);
+        // Manejar el error de descarga del archivo
+      }
+    );
+  }
+
+
+
+
+
+
+
 
 }

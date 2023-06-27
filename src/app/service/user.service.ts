@@ -21,6 +21,7 @@ export class UserService {
   }
 
   public updateUser(formData: FormData): Observable<User> {
+    console.log('FormData:', formData);
     return this.http.post<User>(`${this.host}/user/update`, formData);
   }
 
@@ -51,17 +52,20 @@ export class UserService {
     return null;
   }
 
-  public createUserFormDate(loggedInUsername: string, user: User, profileImage: File): FormData {
+  public createUserFormDate(loggedInUsername: string, user: User, profileImage?: File): FormData {
     const formData = new FormData();
     formData.append('currentUsername', loggedInUsername);
     formData.append('firstName', user.firstName);
     formData.append('lastName', user.lastName);
     formData.append('username', user.username);
     formData.append('institution', user.institution);
-    formData.append('identificationType', user.identificationType.toString());
+    formData.append('identificationType.idIdentificationType', user.identificationType.idIdentificationType.toString());
+    formData.append('identificationType.identification', user.identificationType.identification);
     formData.append('email', user.email);
     formData.append('role', user.role);
-    formData.append('profileImage', profileImage);
+    if (profileImage) {
+      formData.append('profileImage', profileImage);
+    }
     formData.append('isActive', JSON.stringify(user.active));
     formData.append('isNonLocked', JSON.stringify(user.notLocked));
     return formData;
@@ -75,9 +79,12 @@ export class UserService {
     formData.append('username', user.username);
     formData.append('email', user.email);
     formData.append('role', user.role);
-    formData.append('isActive', JSON.stringify(user.active));
+    formData.append('active', JSON.stringify(user.active));
     formData.append('isNonLocked', JSON.stringify(user.notLocked));
-    formData.append('identificationType', user.identificationType.toString());
+    formData.append('identificationType.idIdentificationType', user.identificationType.idIdentificationType.toString());
+    formData.append('identificationType.identification', user.identificationType.identification);
+    formData.append('identificationType.name', user.identificationType.name);
+
     return formData;
   }
 

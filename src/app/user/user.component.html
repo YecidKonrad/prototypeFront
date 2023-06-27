@@ -409,10 +409,11 @@
                   <label for="identificationType">Identification Type <small [hidden]="isAdmin">(read
                       only)</small></label>
                   <select class="form-control" name="identificationType" [disabled]="!isAdmin"
-                    placeholder="Identification type" required ngModel>
-                    <option [value]="identificationType.idIdentificationType"
-                      *ngFor="let identificationType of identificationTypes">
-                      {{identificationType.identification}}</option>
+                    placeholder="Identification type" required [(ngModel)]="user.identificationType">
+                    <option [value]="null">Select identification type</option>
+                    <option [value]="identificationType" *ngFor="let identificationType of identificationTypes">
+                      {{ identificationType.identification }}
+                    </option>
                   </select>
                 </div>
                 <div class="form-group">
